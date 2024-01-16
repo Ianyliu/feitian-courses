@@ -1,0 +1,426 @@
+---
+title: "Regression HW#5"
+output: html_notebook
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+```{r}
+library(tidymodels)
+library(MASS)
+library(olsrr)
+library(bit)
+library(psych)
+```
+
+```{r}
+employee = read.table("P140.txt",header=T, sep="\t")
+election = read.table("P160.txt",header=T, sep="\t")
+corn = read.table("P158.txt",header=T, sep="\t")
+```
+
+# 5.2
+
+## 5.2a Check to see if the usual least squares assumption hold.
+
+```{r}
+fit58 <- lm(JPERF ~ TEST + TEST:RACE, data = employee)
+fit58 %>% summary()
+```
+
+### 1. Linearity & homogeneity
+
+```{r}
+plot(fit58, which=1)
+```
+
+```{r}
+plot(y=residuals(fit58), x=employee$RACE, ylab="Residuals", xlab="RACE")
+plot(y=residuals(fit58), x=employee$TEST, ylab="Residuals", xlab="TEST")
+```
+
+Linearity and homogeneity seem to be met.
+
+### 2. Normality (QQ Plot)
+
+```{r}
+stdres58 = stdres(fit58)
+qqnorm(stdres58, ylab="Ordered Standardized Residuals", xlab="Normal Scores")
+abline(0,1,col="blue")
+```
+
+Normality assumption is met.
+
+### 3. Independence of Errors
+
+```{r}
+obs_num = seq(1, length(employee[,1]))
+plot(y=stdres58,x=obs_num, ylab="Standardized Residuals")
+```
+
+Independence of errors is true.
+
+### 4. Linear independence of predictor variables
+
+```{r}
+pairs.panels(employee[,1:2], 
+             method = "pearson",
+             ellipses = F, 
+             cor = TRUE,
+             lm = TRUE
+)
+```
+
+Linear independence of predictor variables is true. \## 5.2b) Check
+delta = 0 using F-test.
+
+```{r}
+print("Full model")
+fit58 %>% anova()
+print("Reduced model")
+lm(JPERF ~ TEST, data = employee) %>% anova()
+```
+
+```{r}
+sserm = 45.568
+ssefm = 34.708
+dfrm = 1 + 1 - 1 #p+1-k
+dffm = 20 - 2 - 1 #n-p-1
+
+print("critical value")
+print(qf(p=0.05, df1 =dfrm, df2 = dffm, lower.tail = F))
+
+Fstat = ( (sserm-ssefm) / dfrm ) / (ssefm / dffm)
+print("F statistic")
+print(Fstat)
+```
+
+The critical value is smaller than the F test statistic, so we reject H0
+(delta = 0). The coefficient is indeed different for minorities and
+whites.
+
+## 5.2 c)
+
+Test-statistic: 2.306 Critical value = 2.110
+
+The test-statistic is greater than the critical value, so we we reject
+H0 and conclude that the interactive variable is indeed necessary.
+
+## 5.2 d)
+
+To compare the equivalence of the 2 tests, we can utilize the fact that
+T\^2 = F and do a comparison.
+
+critical value of T \^2 = 4.4521, t test statistic \^2 = 5.317636
+
+F critical value: 4.451322
+
+F test statistic= 5.319235
+
+They appear to be equivalent
+
+# 5.5 Check delta = 0 using t-test.
+
+```{r}
+fit58 %>% summary()
+```
+
+We can see that the p-value of delta is 0.03395, which is smaller than
+0.5, our alpha. Therefore, we should reject the null hypothesis, as the
+coefficient is indeed different.
+
+## 5.2d)
+
+# 5.5
+
+## 5.5a
+
+df = 48 = n - p - 1
+
+p = 1
+
+n= 50 workers
+
+## 5.5b
+
+var(y) = sse / (n-2) = 338.449/48 = 7.051
+
+## 5.5c
+
+β0 = y bar - β1 \* x bar
+
+15.58 = y bar - (-2.81) \* 0.52 y bar = 15.58 -1.405 = 14.175
+
+## 5.5d
+
+x bar = 0.52 = sum(x) / n sum(x) = number of males = 0.52\* 50 = 26
+
+Number of women = 50- 26 = 24
+
+## 5.5e
+
+R\^2 = SSR/ SST = SSR / (SSR + SSE) = 98.8313/ (98.8313+ 338.449) =
+0.226
+
+22.6 percent of variability in Y can be accounted for by X.
+
+## 5.5f
+
+Correlation coefficient is square root of R\^2 = 0.4754.
+
+## 5.5g
+
+X & Y have a negative linear relationship. In other words, a male worker
+is negatively correlated with weekly wages, so one is more likely to
+earn more as a female.
+
+## 5.5h
+
+Estimated weekly wages for a man = 15.58 -2.81 A: \$1277
+
+## 5.5i
+
+Estimated weekly wages for a woman = 15.58 + 0 A: \$1558
+
+## 5.5j
+
+95% CI: [-2.81 - 0.75 \* 2.021, -2.81 + 0.75 \* 2.021] A: [-4.32575,
+-1.29425]
+
+## 5.5k
+
+a\. H0: β1 = 0, Ha: β1 not equal to 0
+
+b\. test statistic = β1/ se(β1) = -2.81/ 0.75 = -3.74
+
+c\. critical value = t (0.025, df = 48) = 2.021
+
+d\. The conclusion is that that \|-3.74\| \> 2.021, we reject H0 and
+conclude that the average weekly wages of men is different from that of
+women.
+
+# 5.6
+
+## 5.6a
+
+R\^2 = SSR / (SSR + SSE) = 4604.7 / (4604.7 + 1604.44) = 0.7416
+Correlation Coefficient, r = 0.8612
+
+## 5.6b
+
+Using model 2: -4.117 + 100*0.174 - 3.162 = 10.121*
+
+Using model 3*:* -10.882 + 100
+
+0.237 + 2.076 - 100 \* 0.052 = 9.694
+
+## 5.6c
+
+Holding horsepower fixed, Japan would have the least expensive car, as
+it's coefficient is the smallest. For example, given a horsepower of 1,
+Japan would have the cheapest vehicle.
+
+## 5.6d
+
+H0: δUS = δJp = δGermany = 0 (δ is the coefficient for the interaction
+variable)
+
+Ha: not H0
+
+Test statistic: F = [[ sse(rm) - sse(fm) ] /(p+1-k)]/ [sse(fm) /
+(n-p-1)]
+
+```{r}
+sserm = 1390.31
+ssefm = 1319.85
+p = 7
+k=5
+n = 90
+df1 = p + 1 - k
+df2 = n - p - 1
+
+((sserm - ssefm) / df1 ) / (ssefm / df2)
+qf(p=0.05, df1 =df1, df2 = df2, lower.tail = F)
+```
+
+Our test statistic (1.459186) is smaller than the critical value, so we
+fail to reject H0, and realize that there is an interaction between
+horsepower and Countries.
+
+## 5.6e
+
+H0: βusa = βjp = βgermany = 0 Ha: not H0
+
+```{r}
+sserm = 1604.44
+ssefm = 1390.31
+p = 4
+k=2
+n = 90
+df1 = p + 1 - k
+df2 = n - p - 1
+
+((sserm - ssefm) / (df1) ) / (ssefm / (df2))
+qf(p=0.05, df1 =df1, df2 = df2, lower.tail = F)
+```
+
+Since our test statistic is greater than the critical value, we reject
+H0. So Country is an important predictor of the price of a car.
+
+## 5.6f
+
+Yes, the less the number of categories, the higher the degree of
+freedom. The interaction coefficients of USA and Japan in model 3 and
+the coefficients of USA and Japan seem relatively similar, so we might
+be able to join those 2 countries together into 1 category.
+
+## 5.6g
+
+FM: Price = β0 + β1 \* horsepower + β2 \* usa + β3 \* jp + β4 \*
+XGermany + β5 (Hp\* USA) + β6 (Hp\* Japan) + β7 (Hp\* Germany) RM: Price
+= β0 + β1 \* horsepower + β2 \* usa + β3 \* jp + β4 \* XGermany + β5
+(Hp\* USA + Hp\* Japan) + β6 (Hp\* Germany)
+
+We will test the difference between Hp \* USA and Hp \* Japan using
+T-test. The formula would be t = (β5 hat- β6 hat ) / se (β5 hat - β6 hat
+) Alternatively, we could use the F-test using a reduced model and a
+full model.
+
+# 5.7
+
+## 5.7a
+
+```{r}
+corn <- corn %>% 
+  mutate(F1 = ifelse(Fertilizer == 1, 1, 0),
+         F2 = ifelse(Fertilizer == 2, 1, 0),
+         F3 = ifelse(Fertilizer == 3, 1, 0))
+```
+
+## 5.7b
+
+```{r}
+fitcorn <- lm (Yield ~ F1 + F2 + F3, data = corn)
+fitcorn %>% summary()
+```
+
+## 5.7c
+
+H0:µ1 = µ2 = µ3 = 0 Ha: not H0 or at least 1 of (µ1,µ2,µ3) isn't equal
+to 0. Test used: F
+
+```{r}
+fitcorn %>% summary()
+```
+
+The p-value is 0.004605, which is smaller than 0.05, meaning that we
+reject the null hypothesis that none of the fertilizers has an effect on
+the crops on average.
+
+## 5.7d
+
+```{r}
+corn <- corn %>% 
+  mutate(Fsome = F1+F2+F3)
+corn_newfit <- lm(Yield ~ Fsome, data=corn)
+corn_newfit %>% summary()
+```
+
+H0: µ1 = µ2 = µ3 Ha: not H0 We will use the F-test.
+
+```{r}
+fitcorn %>% anova()
+corn_newfit %>% anova()
+```
+
+```{r}
+sserm = 1088.4
+ssefm = 845.80
+p = 2
+k=1
+n = 40
+df1 = p + 1 - k
+df2 = n - p - 1
+
+((sserm - ssefm) / (df1) ) / (ssefm / (df2))
+qf(p=0.05, df1 =df1, df2 = df2, lower.tail = F)
+```
+
+The test statistic 5.306337 is larger than the critical value 3.251924,
+so we reject H0 and conclude that at least 1 of the 3 groups do not have
+equal effects.
+
+## 5.7e
+
+F1 has the greatest effect on corn yield as it has the largest
+coefficient.
+
+# 5.9
+
+## 5.9a
+
+```{r}
+election <- election %>%
+  mutate(D1 = ifelse(D == 1, 1, 0)) %>%
+  mutate(D2 = ifelse(D == -1, 1, 0))
+
+fitelectionD1 <- lm(V ~ I +D1 + W + G:I +P + N, data=election)
+fitelectionD2 <- lm(V ~ I +D2 + W + G:I +P + N, data=election)
+fitelectionD0 <- lm(V ~ I + W + G:I +P + N, data=election)
+fitelectionD1 %>% summary()
+fitelectionD2 %>% summary()
+fitelectionD0 %>% summary()
+```
+
+β2 = The effect party has on presidential election.
+
+## 5.9b
+
+```{r}
+fitelection <- lm(V ~ I + D+ W+ G:I +P + N, data=election)
+fitelection %>% summary()
+```
+
+To determine if we need I, we can do a t-test of H0: β1 = 0 The p-value
+is 0.2539, which is larger than 0.05, so we fail to reject the null
+hypothesis that β1 = 0, meaning that we probably do not need I.
+
+## 5.9c
+
+We can do a t-test of H0: δ = 0 The p-value is 8.24e-05, which is
+smaller than 0.5. So we reject H0 and keep G:I for now.
+
+## 5.9d
+
+We can use the t-test to test if the coefficients are necessary. Looking
+at the p-values, D and I:G all have p-values less than 0.5, meaning we
+might be able to take them out.
+
+```{r}
+other_fit <- lm (V ~ I + N + P, data=election)
+other_fit %>% summary()
+```
+
+However, this lowers our adjusted R-squared value from 0.6998 to 0.1319.
+So we might want to try something else.
+
+Another approach, although insufficient, can give us some insight into
+how other models perform. We compare the adjusted R-square for every
+model.
+
+```{r}
+ols_step_all_possible(fitelection)
+```
+
+V \~ I D N I:G is the model with the highest R-square, so let's look at
+the model.
+
+```{r}
+other_fit <- lm (V ~ I + D+ N + I:G, data=election)
+other_fit %>% summary()
+```
+
+We might expect this model to perform better, but we need to further
+examine if any assumptions are violated or if there are any
+outliers/influential observations/high leverage points.

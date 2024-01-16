@@ -1,0 +1,496 @@
+---
+title: "STA311 HW4"
+output:
+  pdf_document: default
+  html_notebook: default
+---
+
+# STA311 HW 4
+
+```{r}
+library(tidymodels)
+library(MASS)
+library(olsrr)
+library(bit)
+library(psych)
+```
+
+Read in all data
+
+```{r}
+comp_repair <- read.table(file="P124.txt", header = TRUE, sep ="\t")
+cig = read.table(file="P088.txt", header = TRUE, sep ="\t")
+table48 <- read.table(file="P128.txt", header = TRUE, sep ="\t")
+```
+
+## 4.3a
+
+```{r}
+print(head(comp_repair))
+```
+
+```{r}
+#4.3a
+print("4.3a")
+fit_comp <- lm(Minutes ~ Units, data = comp_repair)
+fit_comp %>% summary()
+```
+
+## 4.3b)
+
+There are 4 standard regression assumptions:
+
+1.  Linearity
+
+2.  Errors iid and ei\~N(0,sigma\^2)
+
+    1.  Normality assumption
+
+    2.  mean = 0
+
+    3.  Constant variance (homogeneity/homoscedasticity)
+
+    4.  Independent-errors (pairwise covariance = 0)
+
+3.  Predictions
+
+    1.  Predictor variables nonrandom (fixed/selected in advance)
+
+    2.  Measured without error
+
+    3.  Predictor variable linearly independent of each other
+
+4.  All observations equally reliable and play equal role in determining conclusion
+
+Note: The studentized residuals can take 2 forms:
+
+1)  ri internally studentized residuals (includes all data points)
+
+2)  ri\* externally studentized residuals (does not include ith data point)
+
+For 1, we use stdres() For 2, we use studres()
+
+Since the textbook uses 1, we will use 1 as well.
+
+### Linearity
+
+#### X vs Y Scatter Plot
+
+```{r}
+ggplot(comp_repair, aes(Units, Minutes)) +
+  geom_point() +
+  geom_smooth(method='lm', se =FALSE)
+
+```
+
+The points seem to be roughly following a linear pattern. The linearity assumption is met.
+
+### Normality
+
+#### Normal Probability Plot
+
+```{r}
+comp_rep_stdres = stdres(fit_comp)
+qqnorm(comp_rep_stdres, ylab="Ordered Standardized Residuals", xlab="Normal Scores")
+abline(0,1,col="blue")
+```
+
+The points do not seem to exactly follow the line, but the difference isn't too large.
+
+### Homogeneity of Variance
+
+#### Scatterplot
+
+```{r}
+plot(y=comp_rep_stdres, x= comp_repair$Units, ylab = "Residuals", xlab = "Units") 
+```
+
+The points seem to be scattered across everywhere. Based on this, we can probably say that the residuals have constant variance and that the homogeneity assumption is satisfied.
+
+Note that the plot above is equivalent to Standardized Residuals vs Fitted Values, as seen below.
+
+```{r}
+plot(fit_comp, which=1)
+```
+
+### Independence of Errors
+
+#### Index Plot of Standardized Residuals
+
+```{r}
+observation_num = seq(1, length(comp_rep_stdres))
+plot(y=comp_rep_stdres,x=observation_num, ylab="Standardized Residuals")
+```
+
+The points do not seem to follow any specific pattern. Independent-errors assumption seems to be met.
+
+### Other Assumptions
+
+-   We cannot verify if our x values are measured without error. In reality it is hardly ever satisfied. However, if the measurement errors are not large, the effect is little.
+
+-   The predictor variable is fixed or selected in advance. We are unable to verify this as well.
+
+-   Predictor variables are linearly independent. Since there is only 1 predictor variable, this assumption is not violated.
+
+-   We assume that every observation has about the same reliability and role in determining regression results.
+
+In total, none of the verifiable assumptions seems to be severely violated. Therefore, a regression model is applicable to this set of data.
+
+## 4.5a)
+
+In the case of simple linear regression, we can just use a simple X versus Y plot to observe if a linear relationship is present. When faced with multiple covariates, it can be difficult due to the high dimensionality of the data. However, we can plot a scatter plot of standardized residuals against each of the predictor variables one-by-one.
+
+Note that this is plot is no longer equivalent to plotting standardized residuals against fitted values because we are not dealing with simple regression.
+
+Example of Valid Assumption
+
+```{r}
+plot( rnorm(100, 0, 1), ylab="Residuals", xlab="Covariate", ylim=c(-2,2))
+```
+
+Example of Invalid Assumption
+
+```{r}
+plot( rlnorm(100, 1, 300), ylab="Residuals", xlab="Covariate", ylim=c(-2,2))
+```
+
+## 4.5b)
+
+To see if observations are independent of each other, we can use the index plot of standardized residuals. This will let us know if certain observations result in more errors and if the ordering of the observations have particular patterns
+
+Example of Valid Assumption
+
+```{r}
+obs_num = seq(1,30)
+sample_residuals = sample(obs_num, 30)
+plot(y=sample_residuals, x= obs_num)
+```
+
+Example of Invalid Assumption
+
+```{r}
+obs_num = seq(1,30)
+sample_residuals = reverse_vector(seq(1,30))
+plot(y=sample_residuals, x= obs_num)
+```
+
+## 4.5c)
+
+To verify constant variance for error terms, we can plot scatter plots of standardized residuals against each predictor variable.
+
+Example of Valid Assumption
+
+```{r}
+plot( rnorm(100, 0, 1), ylab="Residuals", xlab="Covariate", ylim=c(-2,2))
+```
+
+Example of Invalid Assumption
+
+```{r}
+plot(sample(x=c(1,2), size = 100, replace =T), ylab="Residuals", xlab="Covariate X")
+```
+
+## 4.5d)
+
+In order to check whether or not the errors are uncorrelated, we can utilize an index plot of the standardized residuals.
+
+Example of Valid Assumption
+
+```{r}
+obs_num = seq(1,30)
+sample_residuals = sample(obs_num, 30)
+plot(y=sample_residuals, x= obs_num)
+```
+
+Example of Invalid Assumption
+
+```{r}
+obs_num = seq(1,30)
+sample_residuals = reverse_vector(seq(1,30))
+plot(y=sample_residuals, x= obs_num)
+```
+
+## 4.5e)
+
+To confirm that the errors are normally distributed, we can use a normal probability plot of standardized residuals, also known as the QQ plot.
+
+Example of Valid Assumption
+
+```{r}
+normal_sample=rnorm(100, mean=0, sd=1) 
+qqnorm(normal_sample) 
+abline(0,1,col="blue")
+```
+
+Example of Invalid Assumption
+
+```{r}
+obs_num = seq(1,30)
+qqnorm(obs_num)
+qqline(obs_num)
+```
+
+## 4.5f)
+
+To validate that all observations are equally influential on least squares results, we can employ Haidi's influence measure Hi.
+
+Example of Valid Assumption
+
+```{r}
+obs_num = seq(1,30)
+sample_residuals = sample(obs_num, 30)
+fit_random <- lm(sample_residuals ~ obs_num)
+ols_plot_hadi(fit_random)
+```
+
+Example of Invalid Assumption
+
+```{r}
+fit0=lm(Sales~Age+HS+Income+Black+Female+Price,data=cig)
+ols_plot_hadi(fit0)
+```
+
+## 4.7a)
+
+```{r}
+print(head(cig))
+```
+
+Sales & State: No relationship. Since State is a categorical variable, there is no linear relationship.
+
+Sales & Age: Positive relationship. I believe the greater the median age in the state, the more the sales. This is because one has to be an adult to purchase cigarettes, so if there is a larger portion of teenagers, there will probably be less sales and result in a lower median age as well.
+
+Sales & HS: Negative. I believe that the less the percentage of people over 25 who have completed high school, the higher the sales. Those who don't complete high school typically go out to work directly, where they are more susceptible to external factors (like a coworker smoking).
+
+Sales & Income: Positive. I believe the higher the income, the more the sales because sales depends on how much consumers spend, and how much a consumer spends depends on how much they make.
+
+Sales & Black: Positive. Although this most likely is a personally-biased observation, I typically see more Hispanics and African Americans smoking.
+
+Sales & Females: Negative. My intuition is that men typically smoke more than women, so the more the females, the less the sales.
+
+Sales & Price: Negative. The higher the price, the less likely a consumer wants to or is able to purchase cigarettes.
+
+## 4.7b)
+
+```{r}
+pairs.panels(cig[,2:8], 
+             method = "pearson",
+             ellipses = F, 
+             cor = TRUE,
+             lm = TRUE
+)
+```
+
+## 4.7c)
+
+The direction of the pairwise correlation scatter plot and the correlation coefficients are approximately the same, except for the covariate Black. There seems to be 2 outliers that cause the general trend to become positive.
+
+## 4.7d)
+
+Yes, there are differences in my expectations for HS and Females. I expected them to be negative, but they were positive.
+
+## 4.7e)
+
+```{r}
+fit_cig <- lm(Sales ~ Age + HS + Income + Black + Female + Price, data = cig)
+fit_cig %>% summary()
+```
+
+Surprisingly, there is actually no difference between my expectations in part a) and what I see in the regression coefficients of the predictor variables.
+
+## 4.7f)
+
+In terms of magnitude, the pairwise correlation coefficients are relatively smaller compared to the regression coefficients. I believe this is because each of these variables have only slight or moderate correlation with Sales. However, when considered together as a whole, the predictor variables have greater correlation with Sales.
+
+The only inconsistencies in direction are for Female and Black, which are both have negative coefficients in the model but positive pairwise correlation coefficients. Perhaps the reason is because their individual impact is so small on sales that the direction doesn't really follow the trends seen in the model. Or it could mean that the direction is only negative when it is considered with other variables.
+
+## 4.7g)
+
+In Excercise 3.15, we arrived at the conclusion that Females and Blacks were not needed as predictor variables. Although I believe it is possible for us to omit Blacks as a predictor, I cannot say the same about Females. It's regressor coefficient is larger than anticipated, showing the level of impact it possibly has on the model. We may need to further investigate to make a decision as to whether or not the covariate is needed.
+
+## 4.9a)
+
+```{r}
+cig_residual <- residuals(fit_cig)
+print(sum(cig_residual))
+```
+
+The sum of the ordinary least squares residual is nearly zero in the case of the Cigarette Consumption data thereby demonstrating the correctness numerically.
+
+## 4.9b)
+
+```{r}
+cig_stdres <- stdres(fit_cig)
+cigma <- sigma(fit_cig)
+# cig_studres <- studres(fit_cig)
+cig_n <- length(cig_stdres)
+cig_p <- 6
+
+test_cigma_i_squared <- cigma ^2 * ((cig_n-cig_p-1-cig_stdres^2)/(cig_n-cig_p-2))
+
+sigma_i <-c()
+
+for ( i in 1:51) {
+  df <- cig[-i,]
+  fit_df <- lm(Sales ~ Age + HS + Income + Black + Female + Price, data = df)
+  sigma_i = append(sigma_i, sigma(fit_df))
+}
+sigma_i_squared <- sigma_i^2
+
+
+diff_values = 0
+same_values = 0
+for (i in 1:length(sigma_i_squared)) {
+  if (round(sigma_i_squared[i]) != round(test_cigma_i_squared[i])) {
+  diff_values = diff_values + 1
+  print(round(sigma_i_squared[i]) - round(test_cigma_i_squared[i]))
+  } else {
+    same_values = same_values + 1
+  }
+}
+print(same_values)
+print(diff_values)
+```
+
+After rounding to the nearest ones digit, there are no differences between both types of calculated sigma(i)'s. The correctness is therefore demonstrated numerically.
+
+## 4.12a)
+
+```{r}
+print(head(table48))
+```
+
+```{r}
+fit48 <- lm(Y ~ X1 + X2 +X3+ X4+ X5 +X6, data =table48)
+fit48 %>% summary()
+```
+
+### Linearity & Homogeneity
+
+#### Residuals vs X Plot
+
+```{r}
+
+plot(y=residuals(fit48), x=table48$X1, ylab="Residuals", xlab="X1")
+plot(y=residuals(fit48), x=table48$X2, ylab="Residuals", xlab="X2")
+plot(y=residuals(fit48), x=table48$X3, ylab="Residuals", xlab="X3")
+plot(y=residuals(fit48), x=table48$X4, ylab="Residuals", xlab="X4")
+plot(y=residuals(fit48), x=table48$X5, ylab="Residuals", xlab="X5")
+plot(y=residuals(fit48), x=table48$X6, ylab="Residuals", xlab="X6")
+
+```
+
+#### Residuals vs Fitted Values
+
+```{r}
+ols_plot_resid_fit(fit48)
+```
+
+The points seem be randomly scattered. Therefore, it is safe to say that it satisfies the linearity assumption.
+
+In addition, the spread of the points do not seem to follow any particular pattern, so we can also say that it follows constant variance assumption.
+
+### Normality
+
+#### Normal Probability Plot
+
+```{r}
+stdres48 = stdres(fit48)
+qqnorm(stdres48, ylab="Ordered Standardized Residuals", xlab="Normal Scores")
+abline(0,1,col="blue")
+```
+
+With the exception of one point, most of the points fall on the line, so it is safe to assume that most of the error terms follow a normal distribution.
+
+### Independence of Errors
+
+#### Index Plot of Standardized Residuals
+
+```{r}
+observation_num = seq(1, length(stdres48))
+plot(y=stdres48,x=observation_num, ylab="Standardized Residuals")
+```
+
+The points do not seem to follow any specific pattern. Independent-errors assumption seems to be met.
+
+### Linear Independence of Predictor Variables
+
+#### Pairwise Scatter Plot
+
+The plots between the predictors should show no linear pattern because the predictors are assumed to be linearly independent.
+
+```{r}
+pairs.panels(table48[,2:6], 
+             method = "pearson",
+             ellipses = F, 
+             cor = TRUE,
+             lm = TRUE
+)
+```
+
+We see that there is no obvious linear pattern here, so we can assume that the predictor variables are linearly independent.
+
+### Other Assumptions
+
+-   We cannot verify if our x values are measured without error. In reality it is hardly ever satisfied. However, if the measurement errors are not large, the effect is little.
+
+-   The predictor variable is fixed or selected in advance. We are unable to verify this as well.
+
+-   We assume that every observation has about the same reliability and role in determining regression results.
+
+Overall, none of the verifiable assumptions seems to be severely violated. Therefore, a regression model is applicable to this set of data.
+
+## 4.12b)
+
+```{r}
+ri_48 <- rstandard(fit48)
+ci_48 <- cooks.distance(fit48)
+dfit_48<- dffits(fit48)
+hadi_48 <- ols_hadi(fit48)
+ri_48
+```
+
+```{r}
+ci_48
+```
+
+```{r}
+dfit_48
+```
+
+```{r}
+hadi_48
+```
+
+## 4.12c)
+
+```{r}
+ols_plot_resid_stand(fit48)
+plot(x= seq(1, length(table48[,1])), y=ci_48, ylab="Ci", xlab= "Index")
+ols_plot_cooksd_bar(fit48)
+ols_plot_dffits(fit48)
+ols_plot_hadi(fit48)
+ols_plot_resid_pot(fit48)
+```
+
+## 4.12d)
+
+```{r}
+cutoffpoint <- 2*(6+1)/40
+
+print("Cutoffpoint: 0.35 ")
+hii <- hatvalues(fit48)
+plot(hii, type = 'h', ylab="Hii (Leverage)")
+
+for (i in seq_along(hii)) {
+  if (hii[[i]] > 0.35) {
+    print(i)
+  }
+}
+```
+
+Outliers: 38
+
+Leverage Points: 3,15
+
+Influential Points: 34, 38

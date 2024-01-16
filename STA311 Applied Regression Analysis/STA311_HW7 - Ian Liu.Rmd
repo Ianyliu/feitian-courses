@@ -1,0 +1,257 @@
+---
+title: "STA311 HW7"
+output: html_notebook
+---
+
+```{r}
+library(tidymodels)
+library(MASS)
+library(olsrr)
+library(bit)
+library(car)
+library(psych)
+```
+
+# 11.1
+
+```{r}
+air_pollution = read.table("P320-1.txt",header=T, sep="\t")
+sample(air_pollution)
+```
+
+## 11.1a)
+
+```{r}
+air_pollution_fm <- lm("Y ~ X1+X2+X3+X4+X5+X6+X9+X14", data=air_pollution)
+air_pollution_fm %>% summary()
+```
+
+```{r}
+ols_step_best_subset(air_pollution_fm, metric ="aic")
+```
+
+Best model: Model 7: Y\~X1+ X2+ X3+ X5+ X6+ X9+ X14
+
+R^2^ adj: 0.7098, AIC: 601.1026
+
+## 11.1b)
+
+```{r}
+air_pollution_fm <- lm("Y ~ X1+X2+X3+X4+X5+X6+X7+X8+X9+X10+X11+ X13+X14", data=air_pollution)
+air_pollution_fm %>% summary()
+```
+
+```{r}
+ols_step_best_subset(air_pollution_fm, metric ="aic")
+```
+
+Best Model: Model 7: Y\~X1+ X2+ X3 +X5+ X6+ X9+ X14
+
+R^2^ adj.:0.7098, AIC: 601.1026
+
+## 11.1c)
+
+```{r}
+air_pollution_fm <- lm("Y ~ X1+X2+X3+X4+X5+X6+X7+X8+X9+X10+X11+ X12+X14", data=air_pollution)
+air_pollution_fm %>% summary()
+```
+
+```{r}
+ols_step_best_subset(air_pollution_fm, metric ="aic")
+```
+
+Best Model: Model 7: Y\~X1+ X2+ X3 +X5+ X6+ X9+ X14
+
+R^2^ adj.:0.7098, AIC: 601.1026
+
+The best model subset selection seems to be the same.
+
+# 11.2
+
+Standardized = (x-mu)/se
+
+Y=0.025868X1+-0.02975\* X2+-0.0069 \*X3 +-0.0292 \* X4 +-0.0266 \* X5 +-0.01958 \* X6 +-0.0001513119\* X7+ 0.0008255409\*X8 + 0.1610318\*X9 + -0.000652328 \* X10 + -0.001561286 \* X11 + -0.2518646 \* X12 + 0.2999118 \* X13 + 0.01303026 \* X14 + 0.0127275 \* X15
+
+# 11.4
+
+```{r}
+building = read.table("P329.txt",header=T, sep="\t")
+sample(building)
+```
+
+```{r}
+building_fm <- lm("Y ~ X1+X2+X3+X4+X5+X6+X7+X8+X9", data=building)
+building_fm %>% summary()
+```
+
+```{r}
+ols_step_best_subset(building_fm, metric ="aic")
+```
+
+Best Model: Model 4: Y\~X1+X2+X5+X7
+
+R^2^ adj.:0.7968, AIC: 122.3662
+
+# 11.5
+
+```{r}
+building = read.table("P329.txt",header=T, sep="\t")
+sample(building)
+```
+
+## 11.5a
+
+I would include most variables except for number of bathrooms and number of bedrooms because they are included in the number of rooms (X6).
+
+## 11.5b
+
+I think in general these 3 variables can adequately describe the sale price.
+
+## 11.5c
+
+```{r}
+lm("Y~ X1",data=building) %>% summary()
+```
+
+```{r}
+lm("Y~ X1 +X6",data=building) %>% summary()
+```
+
+```{r}
+lm("Y~ X1 +X4",data=building) %>% summary()
+```
+
+I agree that the most important predictor of sales price is the local taxes (as seen above, the R2 adjusted does not increase much when we add in the number of rooms as a predictor variable). I think it is an adequate model to just have local taxes.
+
+# 11.6
+
+```{r}
+gas = read.table("P256.txt",header=T, sep="\t")
+sample(gas)
+```
+
+## 11.6a
+
+I think including all variables may be a good start. I don't know enough about cars to make any judgement, but most of these variables seem to be independent and have might have an effect on the response variable. If I had to remove some of the variables, I would removed Width and Overall length because they don't seem as relevant.
+
+## 11.6b
+
+```{r}
+lm("Y ~ X1", data = gas) %>% summary()
+lm("Y ~ X10", data = gas)%>% summary()
+lm("Y ~ X1 + X10", data = gas) %>% summary()
+lm("Y ~ X2 + X10", data = gas) %>% summary()
+lm("Y ~ X8 +X10", data = gas)%>% summary
+lm("Y ~ X8+X5+X10", data = gas)%>% summary()
+```
+
+I would choose model 4, with X2 and X10 as the predictor variables because they seem to be most relevant to miles/gallon. However, based on R2 adjusted I would choose X8 X5 and X10.
+
+I would consider adding X2 X1 and X11 to see if it might be better
+
+## 11.6c
+
+```{r}
+plot(y=gas$Y, x=gas$X1)
+plot(y=gas$Y, x=gas$X2)
+plot(y=gas$Y, x=gas$X8)
+plot(y=gas$Y, x=gas$X10)
+```
+
+The relationship may not be linear but exponential.
+
+## 11.6d
+
+```{r}
+plot(y=100/gas$Y, x=gas$X1)
+plot(y=100/gas$Y, x=gas$X2)
+plot(y=100/gas$Y, x=gas$X8)
+plot(y=100/gas$Y, x=gas$X10)
+```
+
+The relationship looks more linear than it was.
+
+## 11.6e
+
+```{r}
+gas$W = 100/gas$Y
+
+lm("W ~ X10", data = gas)%>% summary()
+lm("W ~ X1 + X10", data = gas) %>% summary()
+lm("W ~ X2 + X10", data = gas) %>% summary()
+lm("W ~ X8 +X10", data = gas)%>% summary()
+lm("W ~ X8+X5+X10", data = gas)%>% summary()
+```
+
+It seems like X8 and X10 is the best subset now.
+
+## 11.6f
+
+```{r}
+gas$X13new = gas$X8/gas$X10
+
+lm("Y ~ X13new", data = gas)%>% summary()
+```
+
+## 11.6g
+
+I think we should use W as a response variable and X8/X10, X5 as a predictor variable.
+
+# 8.2a
+
+```{r}
+oil = read.table("P189.txt",header=T, sep="\t")
+oil$logOil <- log(oil$Barrels)
+sample(oil)
+```
+
+```{r}
+oil_lm <- lm ("logOil ~ Year", data=oil)
+durbinWatsonTest(oil_lm)
+```
+From the DW statistic we see that it is not close from 2 (2 is the DW statistic for a non-autocorrelation distribution). In addition, the p-value is 0, so we can reject the null hypothesis that the data is not autocorrelated.
+
+# 8.4
+```{r}
+djia = read.table("P229-30.txt",header=T, sep="\t")
+sample(djia)
+```
+
+##8.4a
+```{r}
+fit_djia <- lm("DJIA ~ Time", data= djia) 
+fit_djia %>% summary()
+```
+```{r}
+stdres_djia <- stdres(fit_djia)
+observation_num = seq(1, length(stdres_djia))
+plot(y=stdres_djia,x=observation_num, ylab="Standardized Residuals")
+```
+The linear model is not adequate because there seems to be some sort of autocorrelation present. 
+
+##8.4b
+```{r}
+djia$lagday = djia$Time - 1
+fit_djia <- lm("Time ~ lagday", data= djia) 
+fit_djia %>% summary()
+```
+```{r}
+stdres_djia <- stdres(fit_djia)
+observation_num = seq(1, length(stdres_djia))
+plot(y=stdres_djia,x=observation_num, ylab="Standardized Residuals")
+```
+This is not an adequate model. Although the index plot does not seem to indicate autocorrelation, the fit is essentially regressing a Y variable against another variant of itself. 
+
+##8.4c
+```{r}
+djia$logday = log(djia$Time)
+fit_djia <- lm("Time ~ logday", data= djia) 
+fit_djia %>% summary()
+```
+```{r}
+stdres_djia <- stdres(fit_djia)
+observation_num = seq(1, length(stdres_djia))
+plot(y=stdres_djia,x=observation_num, ylab="Standardized Residuals")
+```
+
+There still seems to be some sort of patter in the index plot, so the conclusion is similar in that the model is not adequate enough. I don't noticed any differences. 

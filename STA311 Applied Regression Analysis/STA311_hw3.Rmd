@@ -1,0 +1,97 @@
+---
+title: "Regression HW3"
+output: html_notebook
+---
+```{r}
+library(tidymodels)
+```
+
+1
+
+```{r}
+df <- read.table(file="P083.txt", header = TRUE, sep ="\t")
+print(df)
+```
+
+```{r}
+#3.3a
+print("3.3a")
+lm(F ~ P1, data = df) %>% 
+  summary()
+```
+```{r}
+lm(F ~ P2, data = df) %>% 
+  summary()
+```
+
+```{r}
+lm(F ~ P2 + P1, data = df) %>% 
+  summary()
+```
+3.3b)
+```{r}
+t1 = -22.3424/11.5640
+t2 = -1.85355/7.56181
+t3 = -14.5005/9.2356
+#F3
+# aov(F ~ P2+P1, data = df) %>%
+#   summary()
+# anova(rms::ols(F ~ P2, data = df))
+```
+
+```{r}
+df <- read.table(file="P060.txt", header = TRUE, sep ="\t")
+print(df)
+```
+```{r}
+#FM
+anova(rms::ols(Y ~ X1 +X2 +X3, data = df)) 
+```
+
+```{r}
+lm(Y ~ X1 +X3, data = df) %>% 
+  summary()
+```
+
+```{r}
+#RM
+anova(rms::ols(Y ~ X1 +X3, data = df)) 
+```
+
+```{r}
+df <- read.table(file="P088.txt", header = TRUE, sep ="\t")
+print(df)
+```
+```{r}
+lm(Sales~Age+HS+Income+Black+Female+Price, data = df) %>%
+  summary()
+```
+
+```{r}
+anova(rms::ols(Sales~Age+HS+Income+Black+Female+Price, data = df))
+```
+
+```{r}
+anova(rms::ols(Sales~Age+Income+Black+Price, data = df))
+
+```
+
+```{r}
+lm(Sales~Age+HS+Black+Female+Price, data = df) %>%
+  summary()
+```
+```{r}
+lm(Sales~Age+Income+Price, data = df) %>%
+  summary()
+```
+
+```{r}
+lm(Sales~Income, data = df) %>%
+  summary()
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.

@@ -1,0 +1,651 @@
+---
+title: "Regression HW#6"
+output:
+  pdf_document: default
+  html_notebook: default
+editor_options:
+  markdown:
+    wrap: 72
+---
+
+```{r}
+library(tidymodels)
+library(MASS)
+library(olsrr)
+library(bit)
+library(psych)
+library(trafo)
+```
+
+Need help with 6.1c,
+
+```{r}
+advertising = read.table("P187.txt",header=T, sep="\t")
+election = read.table("P160.txt",header=T, sep="\t")
+oil = read.table("P189.txt",header=T, sep="\t")
+```
+
+# 6.1
+
+## 6.1a
+
+The correlation coefficient between Y and X is -0.777. When
+
+## 6.1b
+
+When lambda = -1, there seems to be the strongest correlation
+coefficient between Y^λ^ and X. It is easy to understand as Y^-1^ is the
+same as 1/Y, so the larger 1/Y is, the less Y is.
+
+## 6.1c
+
+1/Y = α + β X + ε
+
+Y = 1/(α + βX) + ε'
+
+# 6.3
+
+## 6.3a
+
+```{r}
+ad_fit <- lm(R ~ P, data = advertising) 
+ad_fit %>% summary()
+```
+
+Y = 7.6041 + 0.3527 X + ε
+
+From our R^2^, we can see that only 12.63% of the overall variability
+can be explained using this model, thereby indicating a poor fit. The
+global hypothesis testing if all coefficients = 0 is rejected under
+alpha = 0.05, so the coefficients are significant.
+
+## 6.3b
+
+To evaluate which transformation may be appropriate, let's first graph
+the variables.
+
+```{r}
+plot(advertising$P, advertising$R, ylab= "Revenue", xlab="Price") 
+```
+
+The graph seems to have an exponential trend, so let's use the box-cox
+transformation.\
+\
+
+```{r}
+#assumptions(ad_fit, method = 'ml')
+log_ad_fit <- lm(log(R) ~ log(P), data = advertising) 
+log_ad_fit %>% summary
+```
+
+The fit is better, with a higher R square and a more significant
+p-value, as well as a really low residual standard error.
+
+The assumptions also seem to be more closely met than before.
+
+```{r}
+plot(log_ad_fit)
+```
+
+## 6.3c
+
+To determine outliers, let's first construct a standardized residuals
+plot.
+
+```{r}
+ols_plot_resid_stand(log_ad_fit)
+```
+
+Let's remove the points 15, 22, 23, and 41.
+
+```{r}
+new_ad <- advertising[-c(15,22,23,41),]
+```
+
+The new fitted model is as follows
+
+```{r}
+new_ad_fit <- lm(log(R) ~ log(P), data = new_ad) 
+new_ad_fit %>% summary()
+```
+
+The residual standard error is even smaller, the R^2^ is even larger,
+and the p-value indicates even more significance.
+
+# 6.5
+
+## 6.5a
+
+```{r}
+elect_fit <- lm (V ~ I + D + W + G:I + P + N, data = election)
+elect_fit %>% summary()
+```
+
+```{r}
+elect_trans_fit <- lm (log(V/ (1-V)) ~ I + D + W + G:I + P + N, data = election)
+elect_trans_fit %>% summary()
+```
+
+```{r}
+qqnorm(stdres(elect_fit), ylab="Ordered Standardized Residuals", xlab="Normal Scores")
+abline(0,1,col="blue")
+```
+
+```{r}
+ols_plot_resid_stand(elect_fit)
+plot(elect_fit, which=1)
+plot(y=residuals(elect_fit), x=election$I, ylab="Residuals", xlab="I")
+plot(y=residuals(elect_fit), x=election$D, ylab="Residuals", xlab="D")
+plot(y=residuals(elect_fit), x=election$W, ylab="Residuals", xlab="W")
+plot(y=residuals(elect_fit), x=election$P, ylab="Residuals", xlab="P")
+plot(y=residuals(elect_fit), x=election$N, ylab="Residuals", xlab="N")
+plot(y=residuals(elect_fit), x=election$G * election$N, ylab="Residuals", xlab="G:N")
+```
+
+```{r}
+obs_num = seq(1, length(election[,1]))
+plot(y=stdres(elect_fit),x=obs_num, ylab="Standardized Residuals")
+```
+
+```{r}
+ols_plot_resid_stand(elect_trans_fit)
+plot(elect_trans_fit, which=1)
+plot(y=residuals(elect_trans_fit), x=election$I, ylab="Residuals", xlab="I")
+plot(y=residuals(elect_trans_fit), x=election$D, ylab="Residuals", xlab="D")
+plot(y=residuals(elect_trans_fit), x=election$W, ylab="Residuals", xlab="W")
+plot(y=residuals(elect_trans_fit), x=election$P, ylab="Residuals", xlab="P")
+plot(y=residuals(elect_trans_fit), x=election$N, ylab="Residuals", xlab="N")
+plot(y=residuals(elect_trans_fit), x=election$G * election$N, ylab="Residuals", xlab="G:N")
+```
+
+```{r}
+qqnorm(stdres(elect_trans_fit), ylab="Ordered Standardized Residuals", xlab="Normal Scores")
+abline(0,1,col="blue")
+```
+
+```{r}
+obs_num = seq(1, length(election[,1]))
+plot(y=stdres(elect_trans_fit),x=obs_num, ylab="Standardized Residuals")
+```
+
+For the linear independence of predictor variables, and equal influence
+of all observations assumptions, we cannot say which model satisfies
+these assumptions better because the data is the same regardless of the
+model.
+
+For the other assumptions (normality, linearity, homogeneity,
+independence of observations), we can see from the residuals plots that
+these assumptions are met about equally as well.
+
+## 6.5b
+
+V / (1-V) =
+e^β0 + I \*β1 + D \* β2 + W \*β3 + P \* β4 + N \*β5 + γ \* G \* I^
+
+1 / (1/V-1) =
+e^β0 + I \*β1 + D \* β2 + W \*β3 + P \* β4 + N \*β5 + γ \* G \* I^
+
+1/V - 1 = 1/
+(e^β0 + I \*β1 + D \* β2 + W \*β3 + P \* β4 + N \*β5 + γ \* G \* I^ )
+
+1/V = 1 + 1/
+(e^β0 + I \*β1 + D \* β2 + W \*β3 + P \* β4 + N \*β5 + γ \* G \* I^ )
+
+V = 1/ (1 + 1/
+(e^β0 + I \*β1 + D \* β2 + W \*β3 + P \* β4 + N \*β5 + γ \* G \* I^ ))
+
+# 6.6
+
+```{r}
+election <- election %>%
+  mutate(D1 = ifelse(D == 1, 1, 0)) %>%
+  mutate(D2 = ifelse(D == -1, 1, 0))
+```
+
+```{r}
+elect_fit <- lm (V ~ I + D1 + D2 + W + G:I + P + N, data = election)
+elect_fit %>% summary()
+```
+
+```{r}
+elect_trans_fit <- lm (log(V/ (1-V)) ~I + D1 + D2 + W + G:I + P + N, data = election)
+elect_trans_fit %>% summary()
+```
+We have a higher R^2^ and adjusted R^2^ and a lower p-value, but we have a higher residual standard error as well as higher standard errors for some of the regression coefficients. 
+```{r}
+qqnorm(stdres(elect_fit), ylab="Ordered Standardized Residuals", xlab="Normal Scores")
+abline(0,1,col="blue")
+qqnorm(stdres(elect_trans_fit), ylab="Ordered Standardized Residuals", xlab="Normal Scores")
+abline(0,1,col="blue")
+```
+
+```{r}
+ols_plot_resid_stand(elect_fit)
+plot(elect_fit, which=1)
+plot(y=residuals(elect_fit), x=election$I, ylab="Residuals", xlab="I")
+plot(y=residuals(elect_fit), x=election$D1, ylab="Residuals", xlab="D1")
+plot(y=residuals(elect_fit), x=election$D2, ylab="Residuals", xlab="D2")
+plot(y=residuals(elect_fit), x=election$W, ylab="Residuals", xlab="W")
+plot(y=residuals(elect_fit), x=election$P, ylab="Residuals", xlab="P")
+plot(y=residuals(elect_fit), x=election$N, ylab="Residuals", xlab="N")
+plot(y=residuals(elect_fit), x=election$G * election$N, ylab="Residuals", xlab="G:N")
+```
+
+```{r}
+ols_plot_resid_stand(elect_trans_fit)
+plot(elect_trans_fit, which=1)
+plot(y=residuals(elect_trans_fit), x=election$I, ylab="Residuals", xlab="I")
+plot(y=residuals(elect_trans_fit), x=election$D1, ylab="Residuals", xlab="D1")
+plot(y=residuals(elect_trans_fit), x=election$D2, ylab="Residuals", xlab="D2")
+plot(y=residuals(elect_trans_fit), x=election$W, ylab="Residuals", xlab="W")
+plot(y=residuals(elect_trans_fit), x=election$P, ylab="Residuals", xlab="P")
+plot(y=residuals(elect_trans_fit), x=election$N, ylab="Residuals", xlab="N")
+plot(y=residuals(elect_trans_fit), x=election$G * election$N, ylab="Residuals", xlab="G:N")
+```
+
+```{r}
+obs_num = seq(1, length(election[,1]))
+plot(y=stdres(elect_fit),x=obs_num, ylab="Standardized Residuals")
+```
+
+```{r}
+obs_num = seq(1, length(election[,1]))
+plot(y=stdres(elect_trans_fit),x=obs_num, ylab="Standardized Residuals")
+```
+The assumptions seem to be met about equally as well. 
+
+Comparison of this exercise and previous exercise. 
+In both exercises, the WLS model only showed slight change in the meeting of regression assumptions. Also, both models are not necessarily better than each other because of the bias-variance tradeoff. 
+# 6.7
+
+## 6.7a
+
+```{r}
+plot(y=oil$Barrels,x=oil$Year)
+```
+
+## 6.7b
+
+```{r}
+plot(y=log(oil$Barrels),x=oil$Year)
+```
+
+## 6.7c
+
+```{r}
+fit_oil <- lm(log(Barrels) ~ Year, data = oil)
+fit_oil %>% summary()
+```
+
+log(Oil) = β0 + β X + ε 
+
+Overall, the fit seems to be good. The R\^2 shows that 98.34% of
+variability can be explained and that the residual standard error is a
+low 0.2566. In addition, the standard errors of the coefficients are
+small, and they are all significant. Lastly, the p-value is very small.
+
+## 6.7d
+
+```{r}
+obs_num = seq(1, length(oil[,1]))
+plot(y=stdres(fit_oil),x=obs_num, ylab="Standardized Residuals")
+```
+
+The plot shows that the independence of errors assumption is violated,
+as there is an obvious pattern as the index number increases.
+
+# Chapter 7
+
+```{r}
+edu_512 <- read.table("P151.txt",header=T, sep="\t")
+edu_513 <- read.table("P152.txt",header=T, sep="\t")
+edu_72 <- read.table("P198.txt",header=T, sep="\t")
+```
+
+# 7.2
+
+Y= β~0~ + β1X1 + β2X2 + β3X3 + ε
+
+```{r}
+fit_72 <- lm(Y ~ X1 + X2 + X3,data = edu_513)
+fit_72 %>% summary()
+```
+
+```{r}
+plot(fit_72, which =1)
+plot(y=residuals(fit_72), x=edu_513$Region, ylab="Residuals", xlab="Regions")
+plot(y=residuals(fit_72), x=edu_513$X1, ylab="Residuals", xlab="X1")
+plot(y=residuals(fit_72), x=edu_513$X2, ylab="Residuals", xlab="X2")
+plot(y=residuals(fit_72), x=edu_513$X3, ylab="Residuals", xlab="X3")
+obs_num = seq(1, length(edu_513[,1]))
+plot(y=stdres(fit_72),x=obs_num, ylab="Standardized Residuals")
+```
+
+```{r}
+qqnorm(stdres(fit_72), ylab="Ordered Standardized Residuals", xlab="Normal Scores")
+abline(0,1,col="blue")
+```
+
+By looking at the plots, we observe that there is heteroscedasticity
+present. Also, different regions have different spreads, so the variance
+also varies based on region. Furthermore, the variance tends to increase
+as X2 increases and also as X1 increases. Lastly, as the index
+increases, the magnitude of the residuals tends to increase as well.
+
+```{r}
+ols_plot_resid_stand(fit_72)
+ols_plot_cooksd_bar(fit_72)
+ols_plot_dffits(fit_72)
+ols_plot_hadi(fit_72)
+```
+
+Outliers: 6
+
+Influential points: 6, 42, 48, 49
+
+```{r}
+cutoffpoint <- 2*(3+1)/50
+
+hii <- hatvalues(fit_72)
+plot(hii, type = 'h', ylab="Hii (Leverage)")
+
+for (i in seq_along(hii)) {
+  if (hii[[i]] > cutoffpoint) {
+    print(i)
+  }
+}
+```
+
+High leverage points: 3, 42, 44, 49
+
+Observation 6 is an outlier, an influential point, and a high leverage
+point.
+
+Observations 42 & 49 have high leverage but are also influential.
+
+To check if observations 6, 42, 49 have undue influence on determining regression
+coefficients, we omit them and compare the models.
+
+```{r}
+temp_edu_513 <- edu_513[-c(6, 42,49),]
+temp_fit_72 <- lm(Y ~ X1 + X2 + X3,data = temp_edu_513)
+temp_fit_72 %>% summary()
+```
+
+The regression coefficients seem to change substantially, but in this case we're not sure if there are any special situations present (like in Section 7.4 they know about the historical factors for Alaska). For now, we just remove observation 49, which is Alaska.
+```{r}
+edu_513 <- edu_513[-c(49),]
+fit_72 <- lm(Y ~ X1 + X2 + X3,data = edu_513)
+fit_72 %>% summary()
+```
+
+We evaluate our assumptions again to see if they have changed.
+
+```{r}
+plot(fit_72, which =1)
+plot(y=residuals(fit_72), x=edu_513$Region, ylab="Residuals", xlab="Regions")
+plot(y=residuals(fit_72), x=edu_513$X1, ylab="Residuals", xlab="X1")
+plot(y=residuals(fit_72), x=edu_513$X2, ylab="Residuals", xlab="X2")
+plot(y=residuals(fit_72), x=edu_513$X3, ylab="Residuals", xlab="X3")
+obs_num = seq(1, length(edu_513[,1]))
+plot(y=stdres(fit_72),x=obs_num, ylab="Standardized Residuals")
+qqnorm(stdres(fit_72), ylab="Ordered Standardized Residuals", xlab="Normal Scores")
+abline(0,1,col="blue")
+
+ols_plot_resid_stand(fit_72)
+ols_plot_cooksd_bar(fit_72)
+ols_plot_dffits(fit_72)
+ols_plot_hadi(fit_72)
+cutoffpoint <- 2*(3+1)/48
+
+hii <- hatvalues(fit_72)
+plot(hii, type = 'h', ylab="Hii (Leverage)")
+
+for (i in seq_along(hii)) {
+  if (hii[[i]] > cutoffpoint) {
+    print(i)
+  }
+}
+```
+Now let's construct our weighted model. 
+```{r}
+res = residuals(fit_72)^2
+edu_513 <- read.table("P152.txt",header=T, sep="\t")
+edu_513 <- edu_513[-c(49),]
+edu_513 <- cbind(edu_513, res)
+
+region1 <- edu_513[edu_513$Region == 1, ]
+region2 <- edu_513[edu_513$Region == 2, ]
+region3 <- edu_513[edu_513$Region == 3, ]
+region4 <- edu_513[edu_513$Region == 4, ]
+n1 <- count(region1)
+n2 <- count(region2)
+n3 <- count(region3)
+n4 <- count(region4)
+
+sigma_1_sq <- sum(region1$res) / (n1 - 1)
+sigma_2_sq <- sum(region2$res) / (n2 - 1)
+sigma_3_sq <- sum(region3$res) / (n3 - 1)
+sigma_4_sq <- sum(region4$res) / (n4 - 1)
+c1_sq <- sigma_1_sq/ (sum(region1$res) / 48)
+c2_sq <- sigma_2_sq/ (sum(region2$res) / 48)
+c3_sq <- sigma_3_sq/ (sum(region3$res) / 48)
+c4_sq <- sigma_4_sq/ (sum(region4$res) / 48)
+wgt1 <- 1/ c1_sq
+wgt2 <- 1/ c2_sq
+wgt3 <- 1/ c3_sq
+wgt4 <- 1/ c4_sq
+
+edu_513 <- edu_513 %>%
+  mutate(wgt = ifelse( Region == 1, wgt1, ifelse(Region == 2, wgt2, ifelse(Region == 3, wgt3, wgt4))))
+
+wlsfit_72 <- lm(Y ~ X1 + X2 + X3,data = edu_513, weights = unlist(edu_513$wgt))
+wlsfit_72 %>% summary()
+```
+
+The R^2^ and adjusted R^2^ seem to be higher. The p-value is more
+significant and the residual standard error is smaller.
+
+Now let's evaluate if heteroscedasticity is still present.
+
+```{r}
+plot(wlsfit_72, which =1)
+plot(y=residuals(wlsfit_72), x=edu_513$Region, ylab="Residuals", xlab="Regions")
+plot(y=residuals(wlsfit_72), x=edu_513$X1, ylab="Residuals", xlab="X1")
+plot(y=residuals(wlsfit_72), x=edu_513$X2, ylab="Residuals", xlab="X2")
+plot(y=residuals(wlsfit_72), x=edu_513$X3, ylab="Residuals", xlab="X3")
+obs_num = seq(1, length(edu_513[,1]))
+plot(y=stdres(wlsfit_72),x=obs_num, ylab="Standardized Residuals")
+```
+
+Heteroscedasticity seems to have been removed (at least quite a bit).
+
+# 7.4
+
+```{r}
+edu_72 <- edu_72[-c(49),]
+edu_72 <- edu_72 %>% 
+  mutate(R1 = ifelse(Region == 1, 1, 0),
+         R2 = ifelse(Region == 2, 1, 0),
+         R3 = ifelse(Region == 3, 1, 0),
+         R4 = ifelse(Region == 4, 1, 0))
+fit_74 <- lm (Y ~ X1 + X2 + X3 + R1 + R2 + R3,data = edu_72)
+fit_74 %>% summary()
+```
+
+Compared to the results of Section 7.4 (weighted model), there is a higher R^2^ and
+adjustedR^2^ is not provided. There is also a lower residual standard error.
+
+```{r}
+plot(fit_74, which =1)
+plot(y=residuals(fit_74), x=edu_72$Region, ylab="Residuals", xlab="Regions")
+plot(y=residuals(fit_74), x=edu_72$X1, ylab="Residuals", xlab="X1")
+plot(y=residuals(fit_74), x=edu_72$X2, ylab="Residuals", xlab="X2")
+plot(y=residuals(fit_74), x=edu_72$X3, ylab="Residuals", xlab="X3")
+obs_num = seq(1, length(edu_72[,1]))
+plot(y=stdres(fit_74),x=obs_num, ylab="Standardized Residuals")
+```
+
+The plots from section 7.4 and above both show that the assumptions are not violated.
+Both are about equally as good as following the assumptions.
+
+To test equality of regression across regions, we test for H0: δ1 = δ2 =
+δ3 = δ4, where i of δi is the region number and δ is the coefficient.
+
+Ha: not H0
+
+We will use the F-test. Test statistic: F = [[ sse(rm) - sse(fm) ]
+/(p+1-k)]/ [sse(fm) / (n-p-1)]
+
+```{r}
+fit_74 %>% anova()
+```
+
+```{r}
+temp_fit_74 <- lm(Y ~ X1 + X2 + X3 ,data = edu_72)
+temp_fit_74 %>% anova()
+```
+
+```{r}
+sserm = 57700
+ssefm = 52782
+p = 7
+k= 3 +1 
+n = 49
+df1 = p + 1 - k
+df2 = n - p - 1
+
+((sserm - ssefm) / df1 ) / (ssefm / df2)
+qf(p=0.05, df1 =df1, df2 = df2, lower.tail = F)
+```
+
+Our test statistic is 0.955051, which is less than our critical value
+2.599969, so we fail to reject H0, and conclude that the regressions
+across regions are not significantly different.
+
+# 7.5
+Let's 1st calculate the weighted least squares to compare results to. Before that, let's see if we should remove Alaska or not. 
+```{r}
+fit_75 <- lm(Y ~ X1 + X2 + X3,data = edu_512) 
+plot(fit_75, which =1)
+plot(y=residuals(fit_75), x=edu_512$Region, ylab="Residuals", xlab="Regions")
+plot(y=residuals(fit_75), x=edu_512$X1, ylab="Residuals", xlab="X1")
+plot(y=residuals(fit_75), x=edu_512$X2, ylab="Residuals", xlab="X2")
+plot(y=residuals(fit_75), x=edu_512$X3, ylab="Residuals", xlab="X3")
+obs_num = seq(1, length(edu_512[,1]))
+plot(y=stdres(fit_75),x=obs_num, ylab="Standardized Residuals")
+qqnorm(stdres(fit_75), ylab="Ordered Standardized Residuals", xlab="Normal Scores")
+abline(0,1,col="blue")
+
+ols_plot_resid_stand(fit_75)
+ols_plot_cooksd_bar(fit_75)
+ols_plot_dffits(fit_75)
+ols_plot_hadi(fit_75)
+cutoffpoint <- 2*(3+1)/49
+
+hii <- hatvalues(fit_75)
+plot(hii, type = 'h', ylab="Hii (Leverage)")
+
+for (i in seq_along(hii)) {
+  if (hii[[i]] > cutoffpoint) {
+    print(i)
+  }
+}
+```
+Since Alaska, which is a special case, is not an influential point, outlier, or high leverage point, we will keep all the data. 
+Let's now calculate weighted least squares. 
+```{r}
+res = residuals(fit_75)^2
+edu_512 <- cbind(edu_512, res)
+
+region1 <- edu_512[edu_512$Region == 1, ]
+region2 <- edu_512[edu_512$Region == 2, ]
+region3 <- edu_512[edu_512$Region == 3, ]
+region4 <- edu_512[edu_512$Region == 4, ]
+n1 <- count(region1)
+n2 <- count(region2)
+n3 <- count(region3)
+n4 <- count(region4)
+
+sigma_1_sq <- sum(region1$res) / (n1 - 1)
+sigma_2_sq <- sum(region2$res) / (n2 - 1)
+sigma_3_sq <- sum(region3$res) / (n3 - 1)
+sigma_4_sq <- sum(region4$res) / (n4 - 1)
+c1_sq <- sigma_1_sq/ (sum(region1$res) / 49)
+c2_sq <- sigma_2_sq/ (sum(region2$res) / 49)
+c3_sq <- sigma_3_sq/ (sum(region3$res) / 49)
+c4_sq <- sigma_4_sq/ (sum(region4$res) / 49)
+wgt1 <- 1/ c1_sq
+wgt2 <- 1/ c2_sq
+wgt3 <- 1/ c3_sq
+wgt4 <- 1/ c4_sq
+
+edu_512 <- edu_512 %>%
+  mutate(wgt = ifelse( Region == 1, wgt1, ifelse(Region == 2, wgt2, ifelse(Region == 3, wgt3, wgt4))))
+
+wlsfit_75 <- lm(Y ~ X1 + X2 + X3,data = edu_512, weights = unlist(edu_512$wgt))
+wlsfit_75 %>% summary()
+```
+
+
+```{r}
+edu_512 <- edu_512 %>% 
+  mutate(R1 = ifelse(Region == 1, 1, 0),
+         R2 = ifelse(Region == 2, 1, 0),
+         R3 = ifelse(Region == 3, 1, 0),
+         R4 = ifelse(Region == 4, 1, 0))
+fit_75 <- lm (Y ~ X1 + X2 + X3 + R1 + R2 + R3 +R4,data = edu_512)
+fit_75 %>% summary()
+```
+
+Although the data is different for Section 7.4 and this question, the
+question asks us to repeat the previous question with different data, so
+we will be comparing results with our WLS Compared to WLS, there
+is higher residual standard error, higher R^2^ and adjusted R^2^, more significant p-value.
+
+```{r}
+plot(fit_75, which =1)
+plot(y=residuals(fit_75), x=edu_512$Region, ylab="Residuals", xlab="Regions")
+plot(y=residuals(fit_75), x=edu_512$X1, ylab="Residuals", xlab="X1")
+plot(y=residuals(fit_75), x=edu_512$X2, ylab="Residuals", xlab="X2")
+plot(y=residuals(fit_75), x=edu_512$X3, ylab="Residuals", xlab="X3")
+obs_num = seq(1, length(edu_512[,1]))
+plot(y=stdres(fit_75),x=obs_num, ylab="Standardized Residuals")
+```
+
+Disregarding outliers, it seems that for the most part, the data follows
+the constant variance assumption.
+
+```{r}
+fit_75 %>% anova()
+```
+
+```{r}
+temp_fit_75 <- lm(Y ~ X1 + X2 + X3 ,data = edu_512)
+temp_fit_75 %>% anova()
+```
+
+```{r}
+sserm = 11332.3
+ssefm = 5267.5
+p = 6
+k= 3 +1 
+n = 50
+df1 = p + 1 - k
+df2 = n - p - 1
+
+((sserm - ssefm) / df1 ) / (ssefm / df2)
+qf(p=0.05, df1 =df1, df2 = df2, lower.tail = F)
+```
+
+To test equality of regression across regions, we test for H0: δ1 = δ2 =
+δ3 = δ4, where i of δi is the region number and δ is the coefficient.
+
+Ha: not H0
+
+We will use the F-test. Test statistic: F = [[ sse(rm) - sse(fm) ]
+/(p+1-k)]/ [sse(fm) / (n-p-1)]
+
+Our test statistic is 16.50286, which is larger than our critical value
+2.821628, so we reject H0, and conclude that the regressions across
+regions are significantly different.

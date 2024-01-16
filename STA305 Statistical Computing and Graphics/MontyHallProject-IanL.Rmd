@@ -1,0 +1,307 @@
+---
+title: "Monty Hall Simulation & Visualisation"
+output:
+  flexdashboard::flex_dashboard:
+    social: menu
+    source_code: embed
+    vertical_layout: fill
+runtime: shiny
+resource_files:
+- Capture-3.png
+- Visual-explanation-of-the-Monty-Hall-problem.png
+- MontyHallVis.png
+---
+
+```{r global, include=FALSE}
+# load data in 'global' chunk so it can be shared by all users of the dashboard
+library(datasets)
+library(tidyverse)
+library(plotly)
+library(ggplot2)
+library(shiny)
+library(plotrix)
+
+pick_door <- function(doors) {
+  if (length(doors) <= 1 ){
+    picked = doors
+  } else {
+    picked = sample(doors, size = 1)
+  }
+  picked
+}
+
+monty_hall <- function(n=3, switch=TRUE) {
+  doors = seq.int(n)
+  prizeDoor = pick_door(doors)
+  Contestant.Picks = pick_door(doors)
+  OthrNonCarOptions = doors[doors != Contestant.Picks & doors != prizeDoor]
+  Monty.Opens = pick_door(OthrNonCarOptions)
+
+  if (switch == T) {
+    restOptions = doors[doors != Monty.Opens & doors != Contestant.Picks]
+    Contestant.Picks = pick_door(restOptions)
+  }
+  (Contestant.Picks == prizeDoor)
+}
+
+
+```
+
+# Problem Description
+
+## Column {.sidebar}
+
+### Problem Description & Explanation
+
+Monty Hall invites you to play a game of guessing. The prize is a car. Now, the car is hidding behind 1 of 3 doors. The other 2 doors contain a goat (which isn't a bad prize if all you want is goat milk). After you select a door, Monty decides to give you a hand by opening another door with a goat behind it. 
+
+With only 2 doors left, should you switch your selection or keep it as is? 
+While some people say the probability is 50/50, statistics tells us otherwise. 
+
+Please enjoy: A Simulation & Visualization of the Monty Hall Problem
+
+## Column
+
+### Goats & Cars
+
+![](Visual-explanation-of-the-Monty-Hall-problem.png){#shiny-2 .class width="80%"}
+
+
+```{r}
+# renderPlot({
+#   hist(faithful$eruptions, probability = TRUE, breaks = as.numeric(input$n_breaks),
+#        xlab = "Duration (minutes)", main = "Geyser Eruption Duration")
+#   
+#   dens <- density(faithful$eruptions, adjust = input$bw_adjust)
+#   lines(dens, col = "blue")
+# })
+```
+
+
+# Simulation 
+
+## Column {.sidebar}
+
+Select the prize door (door with car), the door you will choose, and see if switching does you better.
+
+```{r}
+selectInput("prizeSelect", label = "Select prize door:",
+            choices = c(1, 2, 3), selected = 1)
+
+selectInput("doorSelect", label = "Select your door:",
+            choices = c(1, 2, 3), selected = 3)
+```
+
+```{r}
+renderText({
+  allOptions = c(1,2,3)
+
+  if (input$prizeSelect != input$doorSelect) {
+    prizeChosen = input$prizeSelect
+    doorChosen = input$doorSelect
+    MontyOpens = allOptions[allOptions != prizeChosen]
+    MontyOpens = MontyOpens[MontyOpens != doorChosen]
+
+   paste("Monty opens door: ", MontyOpens[1])
+  } else {
+    prizeChosen = input$prizeSelect
+    MontyOpens <- sample(allOptions[allOptions != prizeChosen], size = 1)
+    paste("Monty opens door: ", MontyOpens[1])
+  }
+})
+
+selectInput("switchDoor", label = "Switch door?",
+             choices = c("Switch", "Don't Switch"), selected = "Switch")
+
+renderText({
+  
+  prizeChosen = input$prizeSelect
+  doorChosen = input$doorSelect
+  switchTF = ifelse(input$switchDoor == "Switch", TRUE, FALSE)
+  switchString = ifelse(switchTF == TRUE, "to switch!", "not to switch!")
+  wonOrLost = "lost"
+  
+  if (switchTF == T) {
+    if (prizeChosen != doorChosen) {
+      wonOrLost = "won"
+    }
+    
+  } else {
+    if (prizeChosen == doorChosen) {
+      wonOrLost = "won"
+    }
+  }
+  
+  loseWin = ifelse(switchTF == TRUE, "to switch!", "not to switch!")
+  paste("You decided ", switchString, "   And you have ", wonOrLost, " as a result!")
+})
+
+```
+
+## Column
+
+### Result
+
+```{r}
+renderText({
+  
+  prizeChosen = input$prizeSelect
+  doorChosen = input$doorSelect
+  switchTF = ifelse(input$switchDoor == "Switch", TRUE, FALSE)
+  switchString = ifelse(switchTF == TRUE, "to switch!", "not to switch!")
+  wonOrLost = "lost"
+  
+  if (switchTF == T) {
+    if (prizeChosen != doorChosen) {
+      wonOrLost = "won"
+    }
+    
+  } else {
+    if (prizeChosen == doorChosen) {
+      wonOrLost = "won"
+    }
+  }
+  
+  loseWin = ifelse(switchTF == TRUE, "to switch!", "not to switch!")
+  paste("You decided ", switchString, "   And you have ", wonOrLost, " as a result!")
+})
+
+```
+
+# Animation & Pie Chart
+
+## Column {.sidebar}
+
+### Animation & Pie Chart
+
+Blue = Win
+
+Red = Lose
+
+```{r}
+selectInput("strategy", label = "Strategy:",
+            choices = c("Switch", "Don't Switch"), selected = "Switch")
+sliderInput("trialnum", label = "Number of Trials",
+            min = 10, max = 1000,
+            value = 10, step = 10)
+# sliderInput("lastyear", label = "last year",
+#             min = 1997, max = 2007, 
+#             value = 1997, step = 1)
+selectInput("scaler", label = "X Axis Scaling (Scatterplot):",
+            choices = c("Scale X Log 10", "No X-Axis Scaling"), selected = "Scale X Log 10")
+
+```
+
+## Column
+
+```{r}
+
+observeEvent(input$trialnum, {
+        print(paste("Event Observed "))
+  
+      })
+
+renderPlotly({
+  
+  resultsdf = data.frame(matrix(ncol = 3, nrow = 0))
+  colnames(resultsdf) <- c('TrialNum', 'WinRate', 'LoseRate')
+
+  for (i in 1:input$trialnum) {
+  if (input$strategy == "Switch") {
+    winR <- mean(replicate( monty_hall(n=3, switch = TRUE) , n=i))
+  } else {
+    winR <- mean(replicate( monty_hall(n=3, switch = FALSE) , n=i))
+  }
+  loseR = 1 - winR
+  resultsdf[nrow(resultsdf) + 1,] = c(i, winR, loseR)
+}
+
+p <- resultsdf %>%
+  filter(TrialNum <= as.numeric(input$trialnum)) %>%
+  ggplot() +
+  geom_point(aes(x=TrialNum, y=WinRate, frame=TrialNum), color= "blue") +
+  geom_point(aes(x=TrialNum, y=LoseRate, frame=TrialNum), color = "red") + 
+  geom_line(aes(x=TrialNum, y=WinRate), color= "blue", alpha=0.2) +
+  geom_line(aes(x=TrialNum, y=LoseRate), color= "red", alpha= 0.2) +
+  theme_minimal() + ylab("Rate") 
+
+  
+if (input$scaler == "Scale X Log 10") {
+  print("scale log 10")
+  p = p + scale_x_log10()
+} else {
+  print("no scaling")
+}
+
+fig <- ggplotly(p)
+
+fig <- fig %>% 
+  animation_opts(
+    1000, easing = "cubic", redraw = FALSE
+  )
+fig <- fig %>%
+  animation_slider(
+    currentvalue = list(prefix = "Trial Number ", font = list(color="gold"))
+  )
+fig
+
+})
+
+renderPlot({
+  
+resultsdf = data.frame(matrix(ncol = 3, nrow = 0))
+colnames(resultsdf) <- c('TrialNum', 'Rate', 'WinOrLose')
+print(input$trialnum)
+for (i in 1:input$trialnum) {
+  if (input$strategy == "Switch") {
+    winR <- mean(replicate( monty_hall(n=3, switch = TRUE) , n=i))
+  } else {
+    winR <- mean(replicate( monty_hall(n=3, switch = FALSE) , n=i))
+  }
+  loseR = 1 - winR
+  resultsdf[nrow(resultsdf) + 1,] = c( i,winR, "win")
+  resultsdf[nrow(resultsdf) + 1,] = c( i,loseR, "lose")
+}
+
+resultsdf$Rate <- as.numeric(resultsdf$Rate)
+results <- group_by(resultsdf, WinOrLose) %>% summarize(sumR=sum(Rate))
+results
+print(results)
+TotalWinRate = results$sumR[results$WinOrLose == "win"]/input$trialnum
+TotalLoseRate = results$sumR[results$WinOrLose == "lose"]/input$trialnum
+results$WinOrLose[results$WinOrLose == "win"] <- paste("Win:", round(TotalWinRate*100, digits=2), "%")
+results$WinOrLose[results$WinOrLose == "lose"] <- paste("Lose:", round(TotalLoseRate*100, digits=2), "%")
+print(TotalLoseRate)
+print(TotalWinRate)
+print(results)
+p <- pie3D(as.numeric(results[[2]]), 
+           labels = results$WinOrLose,
+           main="Pie Chart Visualization of Separate Rendering Results (Same Parameters)") 
+
+p
+})
+
+```
+
+# Explanation
+
+## Column {.sidebar}
+
+### Explanation
+
+Here's an intuitive way to understand why switching is better. Your original choice from the 3 doors gives you odds of 1/3. 
+With 2 doors left, they together, have a 2/3 chance of containing a car. Now, Monty opens one of the doors to reveal the goat, but this does not change the probability (2/3) of the 2 doors containing the car, so the odds will remain 2/3.
+
+Here's another way to think of it. There's 3 ways this can occur. Door 1 has the car, door 2 has the car, and door 3 has the car. 
+
+Let's say that you pick door 1, which has the car. Monty can open any of the remaining two doors, and you would lose if you switch. 
+You continue to pick door 1, but this time door 2 has the car. Monty opens door 3, which has the goat. If you switch you would win. 
+Lastly, if door 3 has the car and you pick door 1, Monty would open door 2 with the goat. In this case switching would also result in a win. 
+
+For every initial selection, you have 3 possible ways things can happen. If you switch, you win in 2 of those possible ways. 
+
+## Column
+
+### Goats & Cars
+![](MontyHallVis.png){#shiny-3 .class width="80%"}
+

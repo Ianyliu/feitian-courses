@@ -1,0 +1,173 @@
+---
+title: "HW02 by Ian Liu"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+Step 0: Update YAML and load all libraries
+
+```{r}
+library(tidyverse)
+library(openintro)
+library(ggimage)
+library(ggrepel)
+```
+
+_Question 1_: According to the data dictionary, how many pets are included in this dataset?
+
+```{r}
+glimpse(seattlepets)
+```
+
+A: According to the data dictionary, there are 52519 pets in this data set. 
+
+_Question 2_: Again, according to the data dictionary, how many variables do we have for each pet?
+
+A: According to the data dictionary, we have 7 variables for each pet. 
+
+_Question3_: What are the three most common pet names in Seattle? To do this you will need to count the frequencies of each pet name and display the results in descending order of frequency so that you can easily see the top three most popular names.
+
+```{r}
+group_by(seattlepets, animal_name) %>%
+     dplyr::summarize(n=n()) %>%
+     arrange(desc(n)) %>% 
+         filter(!is.na(animal_name))
+```
+
+A: The three most common pet names are: Lucy, Charlie, and Luna. 
+
+Let’s also look to see what the most common pet names are for various species. For this we need to first group_by() the species, and then do the same counting we did before.
+
+```{r}
+group_by(seattlepets, species, animal_name) %>%
+     dplyr::summarize(n=n()) %>%
+     arrange(desc(n)) %>% 
+         filter(!is.na(animal_name))
+```
+
+But this output isn’t exactly what we wanted. We wanted to know the most common cat and dog names, but there are barely any cats present in this output!
+
+Why ? Well, let’s count the various species in the data to confirm the existence of cats in the data.
+
+```{r}
+group_by(seattlepets, species) %>%
+     dplyr::summarize(n=n()) %>%
+     arrange(desc(n))
+```
+
+There are two major reasons why we weren't able to see cats before:
+
+1. There are way more dogs than cats in the dataset, so the most common dog names would outrank the most common cat names. 
+
+2. Maybe less cats have names, while more dogs have names. 
+
+Let's search for the top 5 cat and dog names. 
+
+```{r}
+group_by(seattlepets, species, animal_name) %>%
+    dplyr::summarize(n=n()) %>%
+    arrange(desc(n)) %>% 
+    filter(!is.na(animal_name)) %>%
+    slice_max(n, n =5)
+```
+
+It seems that Lucy and Bella are the only names that are most popular (within top 5) for both cats and dogs. 
+
+_Question4_: Based on the previous output we can easily identify the most common cat and dog names in Seattle, but the output is sorted by n (the frequencies) as opposed to being organized by the species. Modify the pipeline to arrange the results so that they’re arranged by species first, and then n. This means you will need to add one more step to the pipeline, and you have two options: arrange(species, n) or arrange(n,
+species). You should try both and decide which one organizes the output by species and then ranks the names in order of frequency for each species.
+
+A:Actually, my previous output does organize output by species first, and then by frequency, so I don't see a need to change it, but here I explore the 2 options and the results that they each yield. 
+
+Let's first rank by species.
+
+```{r}
+group_by(seattlepets, species, animal_name) %>%
+    dplyr::summarize(n=n()) %>%
+    filter(!is.na(animal_name)) %>%
+    slice_max(n, n =5) %>%
+    arrange(species, desc(n))
+```
+
+Now let's try to rank first by n, or count. 
+
+```{r}
+group_by(seattlepets, species, animal_name) %>%
+    dplyr::summarize(n=n()) %>%
+    filter(!is.na(animal_name)) %>%
+    slice_max(n, n =5) %>%
+    arrange(desc(n), species)
+```
+
+For some reason, it seems as if both approaches work. 
+
+_Question5_:What names are more common for cats than dogs? The ones above the line or the ones below the line?
+A: The names more common for cats than dogs are the names below the line because it means the x-value (proportion of cats) is greater than the y-value (proportion of dogs).The only 2 names more common for cats than dogs are "Oliver" and "Lily."
+
+_Question6_:Is the relationship between the two variables (proportion of cats with a given name and proportion of dogs with a given name) positive or negative? What does this mean in context of the data?
+A: The relationship between the 2 variables show a more positive relationship. This means that if a name is common for dogs, it is likely that it is common for cats too. (And vice versa, less popularity in a species probably means less popularity in the other. )
+
+_Question7_:Now create the same plot with your own code, you should properly label the plot the same way. I already prepared the dataframe for this plot comb_name_props and saved it to RDS file, which is the format for any R object. Check documentation here. You can download the file here, then use the code chunk below to load the object, note you want to move the downloaded file to your current working directory (use getwd() in console to find it out):
+
+```{r}
+getwd()
+```
+```{r}
+comb_name_props = readRDS("comb_name_props.RDS")
+```
+```{r}
+View(comb_name_props)
+```
+
+Let's try to recreate the graph given in the homework
+
+```{r}
+ReplicatedGraph <- ggplot(comb_name_props, mapping=aes(x=cat_prop, y=dog_prop)) +
+    geom_point(colour="blue") +
+    ggrepel::geom_text_repel(aes(label=animal_name)) +
+    labs(x="Proportion of Cats", y="Proportion of Dogs") +
+    geom_abline(slope = 1, intercept= 0, color="coral1", size=2, alpha=0.7) +
+    theme_bw() + 
+    theme(panel.border = element_blank()) +
+    xlim(0.002,0.01) + 
+    ylim(0.002,0.01) +
+    ggimage::geom_emoji(
+        image = "1f436", aes(x = 0.003, y = 0.009), size = 0.1
+    ) +
+    ggimage::geom_emoji(
+        image = "1f431", aes(x = 0.009, y = 0.003), size = 0.1
+    ) 
+print(ReplicatedGraph)
+```
+
+1st Line: Load data and specify x and y values
+2nd Line: create points and make them blue
+3rd Line: add text that doesn't overlap
+4th Line: add labels to axes of graph 
+5th Line: make the theme from gray background white lines to white background grey lines
+
+
+_Question8_:Finally, you want to create two data frames, one is called cat_name_props which contains top 30 cat names, its count (column n), and proportion of the count cat_prop (count for each name divided by total counts for named cats), descending ordered by cat_prop:
+
+```{r}
+cat_name_props <- group_by(seattlepets, species, animal_name) %>%
+    dplyr::summarize(n=n()) %>%
+    filter(!is.na(animal_name), species == "Cat") %>%
+    mutate(cat_prop=n/sum(n)) %>%
+    slice_max(n, n =30) %>%
+    arrange(desc(cat_prop))
+cat_name_props
+
+```
+
+The other dataframe is for dogs:
+
+```{r}
+dog_name_props <- group_by(seattlepets, species, animal_name) %>%
+    dplyr::summarize(n=n()) %>%
+    filter(!is.na(animal_name), species == "Dog") %>%
+    mutate(dog_prop=n/sum(n)) %>%
+    slice_max(n, n =30) %>%
+    arrange(desc(dog_prop))
+dog_name_props
+```

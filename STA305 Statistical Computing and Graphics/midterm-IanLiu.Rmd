@@ -1,0 +1,135 @@
+---
+title: "STA205 MIDTERM EXAM - Ian Liu"
+author: "Ian Liu"
+date: 'Due: 11pm Saturday March 12, 2022'
+output:
+  html_notebook:
+    fig_height: 4
+    fig_width: 7
+  html_document:
+    df_print: paged
+  pdf_document: default
+---
+
+
+
+## Academic Honesty Statement
+
+I, Ian Liu, hereby state that I have not communicated with or gained information in any way from my classmates or anyone other than the Professor during this exam, and that all work is my own.
+
+## Load packages
+
+```{r load-packages, message=FALSE}
+# load required packages here
+library(tidyverse)
+library(nycflights13)
+```
+
+## Questions 
+
+### Question 1: 
+
+```{r}
+group_by(flights, dest) %>%
+    dplyr::summarize(n=n()) %>% 
+    arrange(desc(n))
+```
+
+As you can see above, the 10 most common destinations (ordered from having most flight destinations to least) for flights departing from NYC in 2013 are: Chicago O'Hare International Airport (ORD), Hartsfield-Jackson Atlanta International Airport, Los Angeles International Airport, Boston Logan International Airport, Orlando International Airport, Charlotte Douglas International Airport, San Francisco International Airport, Fort Lauderdale-Hollywood International Airport, Miami International Airport, Ronald Reagan Washington National Airport. 
+
+### Question 2
+
+```{r}
+group_by(flights, carrier) %>%
+    dplyr::summarize(n=n()) %>% 
+    arrange(desc(n))
+```
+
+Now that we have the carrier code for the top 10 airlines, we need to find their actual airline names. 
+
+```{r}
+airlines
+```
+
+The top 10 airlines with the most flights departing from NYC in 2013 are (from most flights to least): United Air Lines Inc., JetBlue Airways, ExpressJet Airlines Inc., Delta Air Lines Inc., American Airlines Inc., Envoy Air, US Airways Inc., Endeavor Air Inc., Southwest Airlines Co., Virgin America.
+
+### Question 3
+
+```{r}
+filter(flights, !is.na(arr_delay)) %>%
+    group_by(carrier) %>% 
+    dplyr::summarize(n=n(), mean_arr_delay=mean(arr_delay),    
+                      sum_arr_delay=sum(arr_delay)) %>%
+    arrange(desc(mean_arr_delay))
+
+# The reason I have count and sum is to verify that the mean is indeed correct.
+```
+
+3a) The carrier with the highest mean arrival delay is Frontier Airlines Inc. (F9).
+
+3b) The carrier with the lowest mean arrival delay is Alaska Airlines Inc. (AS).
+
+### Question 4
+
+```{r}
+#First let's find the most delayed flight in the data set, its date, and its origin. 
+arrange(flights, desc(dep_delay)) %>% 
+    select(year, month, day, dep_delay, origin)
+```
+
+```{r}
+#Now that we have its origin and date, we can find out what the temperature was like on that day using the weather dataset. (Here we use a simple, no-join method, but joins can also do the same.)
+filter(weather, origin=="JFK", month==1, day==9) %>%
+    dplyr::summarise(mean_temp=mean(temp))
+
+```
+On January 9th, the day with the highest departure delay of 2013, the mean temperature at JFK, the location of the departure delay, was 42.6575 degrees Fahrenheit. 
+
+### Question 5
+
+```{r}
+#First we find the flights that have non-null arrival delay times and create a new categorical variable called arrival, which tells  us if it was on-time or delayed. 
+flights_w_arrival = filter(flights, !is.na(arr_delay)) %>%
+  mutate(arrival = ifelse(arr_delay <=0, "ontime", "delayed"))
+
+#Next, since we only want the flights with destination to PHL and RDU, we will filter out all the other values. We will also filter out flights that aren't in December.
+phl_rdu_flightswarr = filter(flights_w_arrival, dest == "PHL" | dest == "RDU", month== 12)
+
+```
+
+```{r}
+ggplot(data=phl_rdu_flightswarr, mapping=aes(y=dep_delay, x=arrival)) +
+    geom_boxplot(aes(group=arrival, color=arrival)) +
+    facet_grid(dest ~ origin) +
+    labs(title="On time performance of NYC flights December 2013")
+```
+
+I think the purpose of this visualization is to compare the ratio of December flights that were ontime and delayed. We also want to see if there's a particular airport that has more delays or which destination may cause more delays. 
+
+Since we're comparing with the month of December, we may also want to see if snow has an effect on these 2 airports. After understanding which origin or which destination may cause more delays, we will want to do further investigation in the exploratory data analysis. 
+
+### Extra Credit
+
+
+```{r}
+flights_by_day_and_origin = filter(flights, !is.na(dep_delay)) %>%
+    group_by(month,day, origin) %>%
+    transmute(avg_daily_dep_delay = mean(dep_delay), month=month,day=day,origin=origin)
+temp_by_day_and_origin = filter(weather, !is.na(temp)) %>%
+    group_by(month,day, origin) %>%
+    transmute(avg_daily_temp=mean(temp), month=month,day=day,origin=origin)
+
+FlightAndTempData = inner_join(x=flights_by_day_and_origin, y=temp_by_day_and_origin, 
+           by=c("month" = "month", "day" = "day", "origin" = "origin"))
+
+```
+
+```{r}
+ggplot(data=FlightAndTempData, mapping=aes(x=avg_daily_dep_delay, y=avg_daily_temp)) + 
+  geom_point(mapping=aes(color=origin))
+```
+```{r}
+ggplot(data=FlightAndTempData, mapping=aes(x=avg_daily_dep_delay, y=avg_daily_temp)) + 
+  geom_line(mapping=aes(color=origin))
+```
+

@@ -1,0 +1,121 @@
+---
+title: "STA311 HW2"
+output: html_notebook
+---
+
+```{r}
+sxx <- function(x) {
+    result <- sum((x - mean(x)) ^2 )
+    return(result)
+}
+sxy <- function (x,y) {
+    result <- sum( (x-mean(x)) * (y-mean(y)) )
+    return(result)
+}
+beta1 <- function (x,y) {
+    result <- sxy(x,y)/sxx(x)
+    return(result)
+}
+beta0 <- function (x,y) {
+    result <- mean(y) - beta1(x,y) * mean(x)
+    return(result)
+}
+syy <- function(y) {
+    result <- sum( (y- mean(y)) ^2 )
+    return(result)
+}
+corr <- function(x,y) {
+    result <- sxy(x,y) / sqrt(syy(y) * sxx(x))
+    return(result)
+}
+rsquared <- function(x,y) {
+    result <- (corr(x,y) ^2)
+    return(result)
+}
+y_hat_func <- function(x,y) {
+  b0 <- beta0(x,y)
+  b1 <- beta1(x,y)
+  result <- c()
+  for (i in x) {
+    y_hat_i <- b0 + b1 * i
+    result = append(result, y_hat_i)
+  } 
+  return(result)
+}
+
+s <- function(x,y) {
+  yh <- y_hat_func(x,y)
+  result <- sqrt((sum((y-yh)^2))/(length(x)-2))
+    return(result)
+}
+sb1 <- function(x,y) {
+  result <- s(x,y) / sqrt(sxx(x))
+  return(result)
+}
+sb0 <- function(x,y) {
+  result <- s(x,y) *sqrt(1/length(x) + (mean(x))^2 / sxx(x))
+  return(result)
+}
+```
+
+
+2.5a
+```{r}
+x = c(23,29,49,64,74,87,96,97,109,119,149,145,154,166)
+y= c(1,2,3,4,4,5,6,6,7,8,9,9,10,10)
+
+scat = plot(x,y)
+
+```
+
+```{r}
+y_hat <- y_hat_func(x,y)
+
+scat = plot(y,y_hat)
+```
+
+
+2.7a,b,c 
+
+```{r}
+y1 = c(8.04, 6.95,7.58,8.81,8.33,9.96,7.24,4.26,10.84,4.82,5.68)
+x1 = c(10,8,13,9,11,14,6,4,12,7,5)
+y2=c(9.14,8.14,8.74,8.77,9.26,8.10,6.13,3.10,9.13,7.26,4.74)
+x2=c(10,8,13,9,11,14,6,4,12,7,5)
+y3=c(7.46,6.77,12.74,7.11, 7.81,8.84,6.08,5.39,8.15,6.42,5.73)
+x3=c(10,8,13,9,11,14,6,4,12,7,5)
+y4=c(6.58,5.76,7.71,8.84,8.47,7.04,5.25,12.5,5.56,7.91,6.89)
+y4=c(6.58,5.76,7.71,8.84,8.47,7.04,5.25,12.5,5.56,7.91,6.89)
+
+```
+
+
+```{r}
+df <- read.table(file="husband_wife_height.txt", header = TRUE, sep ="\t",)
+df
+```
+
+```{r}
+df_inch <- df/2.45
+df_husband_taller <- df
+df_husband_taller$Wife = df_husband_taller$Husband - 5
+```
+
+
+```{r}
+library(tidymodels)
+```
+
+```{r}
+linear_reg() %>%
+set_engine("lm") %>%
+fit(Wife ~ Husband, data = df) %>% 
+  tidy()
+```
+
+```{r}
+ggplot(df, aes(Husband, Wife)) +
+  geom_point()+
+  geom_smooth(method='lm', se =FALSE)
+```
+
