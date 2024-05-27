@@ -1,0 +1,57 @@
+/* 25  A */
+DATA CRAYONS; 
+  set '/home/u62223361/Intro to SAS/HW5/crayons3.sas7bdat'; 
+RUN; 
+
+PROC CONTENTS DATA = CRAYONS;
+RUN;
+
+ODS TRACE ON;
+PROC FREQ DATA = CRAYONS;
+	TABLES Issued;
+RUN;
+
+PROC REPORT DATA = CRAYONS;
+	COLUMN Color Hex Issued;
+RUN;
+ODS TRACE OFF;
+
+/* 25  B */
+ODS LISTING FILE='/home/u62223361/Intro to SAS/HW5/crayons3.lst'; 
+PROC FREQ DATA = CRAYONS;
+	TABLES Issued;
+RUN;
+PROC REPORT DATA = CRAYONS;
+	COLUMN Color Hex Issued;
+RUN;
+ODS LISTING CLOSE;
+
+/* 25  C */
+ODS HTML PATH='/home/u62223361/Intro to SAS/HW5/' BODY="crayons3.html"; 
+PROC FREQ DATA = CRAYONS;
+	TABLES Issued;
+RUN;
+PROC REPORT DATA = CRAYONS;
+	COLUMN Color Hex Issued;
+RUN;
+ODS HTML CLOSE;
+
+/* 25  D */
+ODS RTF PATH='/home/u62223361/Intro to SAS/HW5/' BODY="crayons3.rtf"; 
+PROC FREQ DATA = CRAYONS;
+	TABLES Issued;
+RUN;
+PROC REPORT DATA = CRAYONS;
+	COLUMN Color Hex Issued;
+RUN;
+ODS RTF CLOSE;
+
+/* 25  E */
+ODS PDF FILE='/home/u62223361/Intro to SAS/HW5/crayons3.pdf'; 
+PROC FREQ DATA = CRAYONS;
+	TABLES Issued;
+RUN;
+PROC REPORT DATA = CRAYONS;
+	COLUMN Color Hex Issued;
+RUN;
+ODS PDF CLOSE;
