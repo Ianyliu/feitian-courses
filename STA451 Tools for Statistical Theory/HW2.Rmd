@@ -1,0 +1,47 @@
+---
+title: "Tools for Stat Theory HW2"
+output:
+  pdf_document: default
+  html_notebook: default
+---
+
+# Lemma 4.1.2
+
+Let $B$ represent an m × n matrix, and let $V$ represent a linear space of m×n matrices. Then, for any matrix $A$ in $V$, $A+B \in V$ if and only if $B \in V$.
+
+Part 1: Suppose $A$ in $V$ and $B \in V$ $\rightarrow$ Show $A+B \in V$
+
+Since $A$ and $B$ both are in V, by definition its sum will also be in V. 
+$B$ can be represented as $B = A+B-B$
+
+
+Part 2: Suppose $A$ in $V$ and $A+B \in V$ $\rightarrow$ Show $B \in V$
+
+Linear combinations of matrices in $V$ are still in $V$ by definition. Suppose $A+B=C$
+The linear combination $C-A \in V$ so $(B+A)-A \in V$ and therefore $B \in V$.
+
+# Lemma 4.2.2 (for column space)
+For any m × n matrix $A$ and m × p matrix B, $C(B) \subset C(A)$ if and only if there exists an n × p matrix $F$ such that $B = AF$. 
+
+Part 1: If $F$ exists such that $B = AF$, show $C(B) \subset C(A)$.
+
+$B = [a_1,  ..., a_k ] [f_1, ..., f_k] = Af_i$
+Since B can be represented as a linear combination of A, it must be a subspace of A.
+
+
+Part 2: If $C(B) \subset C(A)$, show $F$ exists such that $B = AF$.
+By definition, if $C(B) \subset C(A)$, B can be represented by A in a linear combination, so $F$ must exist.
+
+# Lemma 4.2.2 (for row space)
+For any m × n matrix $A$ and q × n matrix $C$, $R(C) \subset R(A)$ if and only if there exists a q × m matrix $L$ such that $C = LA$.
+
+Part 1: If $L$ exists such that $C = LA$, show $R(C) \subset R(A)$ .
+
+$C = [l_1^T,  ..., l_k^T ] [a_1^T, ..., a_k^T] = Al_i^T$
+Since C can be represented as a linear combination of A, it must be a subspace of A.
+
+
+Part 2: If $R(C) \subset R(A)$, show $L$ exists such that $C = LA$.
+By definition, if $R(C) \subset R(A)$, C can be represented by A in a linear combination, so $L$ must exist.
+
+
