@@ -1,0 +1,76 @@
+---
+title: "Tools for Stat Theory HW4"
+output:
+  html_notebook: default
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+
+# 1 Lemma 8.1.1 Prove Column rank part.
+We can use apply transpose to the row rank proof to achieve the same results. If A has full column rank, then it has $rank(A) = n$. 
+
+Theorem 4.4.1 "The row rank of any matrix $A$ equals the column rank of A" and $rank(A^T) = rank(A)$ as stated in the textbook.
+
+Therefore, $rank(A^T) = rank(A) = n =$ row rank of $A^T$. If $rank(A^T) = n$, Theorem 7.2.2 ("If the coefficient matrix $A$ of a linear system$AX = B$ (in X) has full row rank, then $AX = B$ is consistent.") shows that  matrix $R$ must exist where $A^TR=I_n$ (we set $B=I_n$ and $X=R$). In other words, $A^T$must have a right inverse. If there is matrix $R$ such that $A^TR=I_n$ then $rank(A^T) \geq rank(A^TR) = rank(I_n) = n$ implying (Lemma 4.4.3: For any m × n matrix $A$, rank($A$) $\leq$ $m$ and rank($A$) $\leq$ $n$.) that rank($A^T$) = $n$. If $A^TR = I_n$ then $(A^TR)^T=I_n^T$ and $R^T(A^T)^T = I_n$ and hence $R^TA = I_n$. We have shown that given full column rank, we must have a left inverse matrix $L=R^T$. 
+
+# 2 Corollary 8.1.2 Prove.
+Corollary 8.1.2: A matrix A has both a right inverse and a left inverse if and only if A is a (square) nonsingular matrix. 
+According to Lemma 8.1.1, A has right inverse if and only if there is full row rank (rank(A)= m) and A has left inverse if and only if there is full column rank (rank(A)=n). Thus, if A is to have both a right and left inverse, it needs to have full column and full row rank. In other words, it needs to have rank(A) = m = n. To have m = n, A must be a square matrix. To have full row rank and full column rank at the same time, A must be nonsingular (nonsingular means a full rank square matrix). 
+
+# 3 Let $A$ represent an $m×n$ matrix, $C$ an $n×q$ matrix, and $B$ a $q×p$ matrix. Show that if rank($AC$)=rank($C$), then $R(ACB) = R(CB)$ and $rank(ACB) = rank(CB)$.
+
+Lemma 4.2.2. For any m × n matrix A and m × p matrix B, C(B) $\subset$ C(A) if and only if there exists an n × p matrix F such that B = AF. Similarly, for any m × n matrix A and q × n matrix C, R(C) $\subset$ R(A) if and only if there exists a
+q × m matrix L such that C = LA.
+
+Corollary 4.2.3. For any $m$×$n$ matrix $A$ and $n$×$p$ matrix $F$, $C(AF)$ $\subset$ $C(A)$. Similarly, for any $m$×$n$ matrix $A$ and $q$×$m$ matrix $L$, $R(LA)$ $\subset$ $R(A)$.
+
+
+Corollary 4.4.5. For any $m$×$n$ matrix $A$ and $n$×$p$ matrix $F$, rank($AF$) $\leq$ rank($A$) and rank($AF$) $\leq$ rank($F$).
+
+Corollary 4.4.7. Let $A$ represent an $m$ × $n$ matrix and $F$ an $n$ × $p$ matrix. If rank($AF$) = rank($A$), then $C(AF) = C(A)$. Similarly, if rank($AF$) = rank($F$), then $R(AF) = R(F)$.
+
+Corollary 7.4.4: For any $m$ × $n$ matrix $A$ and $n$ × $s$ matrix $T$, rank($T^TA^TA$) = rank($T^TA^T$) and rank($A^TAT$) = rank($AT$). 
+
+By Corollary 4.4.7, $R(AC) = R(C)$ because $rank(AC) = rank(C)$. Since $R(AC) = R(C)$ so $R(AC) \subset R(C)$ and $R(C) \subset R(AC)$. According to Corollary 4.2.3 $R(ACB) \subset R(CB)$. According to Lemma 4.2.2, if $R(ACB) \subset R(CB)$ then there must be a matrix L such that ACB = LCB. Since $rank(AC) = rank(C)$, and $rank(ACB) = rank(LCB)$, L must equal I and ACB.
+
+
+
+According to Lemma 4.2.2, if $R(AC) \subset R(C)$ then there must exist a matrix L such that AC = LC and if $R(C) \subset R(AC)$ then there must exist a matrix L such that C = LAC.
+
+By Corollary 4.4.5, rank($ACB$) $\leq$ rank($B$), rank($ACB$) $\leq$ rank($A$), rank($ACB$) $\leq$ rank($CB$), and rank($ACB$) $\leq$ rank($AC$) = rank($C$).
+
+According to Corollary 7.4.4, rank($ACBB^T$) = rank($ACB$) and rank($A^TACB$) = rank ($ACB$). $ACBB^T$ results in a $m$ x $q$ matrix. rank($ACBB^T$) $\leq$ $m$ and rank($ACBB^T$) $\leq$ $q$ by Lemma 4.4.3. Hence rank($ACBB^T$) = rank ($ACB$) $\leq$ $q$ and rank($ACBB^T$) = rank ($ACB$) $\leq$ $m$
+
+By Corollary 4.4.7, if rank($AC$)=rank($C$), then $R(AC)=R(C)$.
+
+If rank($AC$)=rank($C$), then rank($AC$) = rank($C$) $\leq$  $n$ and rank($AC$) = rank($C$) $\leq$  $q$ because of Lemma 4.4.3 as aforementioned. Since $AC$ is an $m$x$q$ matrix, then rank($AC$) $\leq$ $m$ as well.
+Rank (CB) <= Rank (C)
+Rank (CB) <= n, Rank (CB) <= p, Rank (CB) <= q, Rank (CB) <= m
+rank (ACB) <= rank(CB) <= rank(C) = rank(AC)
+rank(ACB) <= rank(CB) <= rank(AC) = rank(C)
+
+
+# 4 Let $A$ and $B$ represent m×n matrices. Show that if $C$ is an $r×q$ matrix and $D$ a $q × m$ matrix such that $rank(CD)=rank(D)$, then $CDA=CDB$ implies $DA=DB$, thereby extending the result of Part (1) of Corollary 5.3.3. {Hint. To show that $DA=DB$, it suffices to show that $rank[D(A - B)]= 0$.}
+
+Since $rank(CD)=rank(D)$, by Corollary 4.4.7, we know that $R(CD)=R(D)$. Like #3, we know that $R(CDE)=R(DE)$ where E is a $m$ x $n$ matrix. We can set $E = A-B$ so that $R(CD(A-B))=R(D(A-B))$ => $R(CDA-CDB)=R(DA-DB)$. If $CDA = CDB$ then $CDA-CDB = 0$ which means that rank($CDA-CDB$) = rank(0) = 0. By Corollary 4.4.7, we know that if rank($CDA-CDB$) = 0 then  $R(CDA-CDB) = 0$ and that $0 = R(CDA-CDB)=R(DA-DB) = 0$, thereby implying that $DA-DB=0$.
+
+# 5 Let $V$ be the vector space spanned by the vectors $u_1 = (1, 2, 3)^T$ and $u_2 = (1, 1, -1)^T$. Compute the projection of $v = (1,1,1)^T$ on $u_1$ and $u_2$, respectively. Then compute the projection of $v$ onto $V$.
+
+$proj_L(v)=\frac{v \cdot y}{y \cdot y} y$
+
+$||u_1||= \sqrt{1 \cdot 1+2\cdot2+3\cdot3}=\sqrt{1+4+9}=\sqrt{13}$
+
+$||u_2||=\sqrt{1\cdot1+1\cdot1+(-1)\cdot(-1)}=\sqrt{1+1+1}=\sqrt{3}$
+
+$v \cdot u_1 = 1 \cdot 1 + 1\cdot 2 + 1 \cdot 3 = 1 + 2 +3 = 6$
+
+$v \cdot u_2 = 1 \cdot 1 + 1\cdot 1 + 1 \cdot -1 = 1 + 1 + -1 = 1$
+
+Projection of $v$ on $u_1=\frac{6}{13} (1,2,3)^T =(\frac{6}{13}, \frac{12}{13}, \frac{18}{13})^T$
+
+Projection of $v$ on $u_2=\frac{1}{3} (1,1,-1)^T =(\frac{1}{3}, \frac{1}{3}, \frac{-1}{3})^T$
+
+Projection of $v$ on $V=(\frac{6}{13} + \frac{1}{3}, \frac{12}{13} + \frac{1}{3}, \frac{18}{13} + \frac{-1}{3})^T=$
+$(0.7948718, 1.25641, 1.051282)^T$
+

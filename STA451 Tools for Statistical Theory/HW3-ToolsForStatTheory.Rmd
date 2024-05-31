@@ -1,0 +1,437 @@
+---
+title: "Tools for Stat Theory HW3"
+output:
+  pdf_document: default
+  html_notebook: default
+---
+
+# 1
+Determine whether each following set is linearly independent or linearly dependent.
+
+## (a) $S_1 =\{(1,1,0)',(0,1,1)',(1,1,1)'\}$
+
+A set is linearly independent if (1) $A_j$ for $2 \leq j \leq k$ is not expressible as a linear combination of of 
+$A_1, ... A_{j-1}$.
+
+$$
+S_{12}
+=
+\begin{bmatrix}
+0 \\
+1\\
+1\\
+\end{bmatrix}
+\neq
+x_1 
+\begin{bmatrix}
+1 \\
+1\\
+0\\
+\end{bmatrix}
+$$
+
+The above implies that 0 = $x_1$ and 1 = $x_1$ at the same time.
+Therefore, $S_{12}$ is not expressible by $S_{11}$. 
+
+$$
+S_{13}
+=
+\begin{bmatrix}
+1 \\
+1\\
+1\\
+\end{bmatrix}
+\neq
+x_1 
+\begin{bmatrix}
+1 \\
+1\\
+0\\
+\end{bmatrix}
++
+x_2
+\begin{bmatrix}
+0 \\
+1\\
+1\\
+\end{bmatrix}
+$$
+
+$1 = x_1$
+
+$1 = x_1 + x_2$
+
+$1=x_2$
+
+There is no possible solution for $x_1$ or $x_2$, therefore $S_{13}$ is not expressible by $S_{12}, S_{11}$.
+
+$S_1$ is linearly independent. 
+
+## (b) $S_2 =\{(1,1,1)',(1,2,3)'\}$
+
+$$
+S_{22}
+=
+\begin{bmatrix}
+1 \\
+2\\
+3\\
+\end{bmatrix}
+\neq
+x_1 
+\begin{bmatrix}
+1 \\
+1\\
+1\\
+\end{bmatrix}
+$$
+
+The above implies that 1 = $x_1$, 2 = $x_1$, 3 = $x_1$ at the same time. 
+
+$S_2$ is linearly independent. 
+
+## (c) $S_3 =\{(6,2,-3)',(-2,-4,1)',(4,-7,-2)'\}$
+
+
+$$
+S_{32}
+=
+\begin{bmatrix}
+-2\\
+-4\\
+1\\
+\end{bmatrix}
+=
+x_1 
+\begin{bmatrix}
+6 \\
+2\\
+-3\\
+\end{bmatrix}
+$$
+
+There is no solution for the above. 
+
+$$
+S_{33}
+=
+\begin{bmatrix}
+4\\
+-7\\
+-2\\
+\end{bmatrix}
+=
+x_1 
+\begin{bmatrix}
+6 \\
+2\\
+-3\\
+\end{bmatrix}
++
+x_2
+\begin{bmatrix}
+-2\\
+-4\\
+1\\
+\end{bmatrix}
+$$
+
+There indeed is a solution of $x_1=3/2$ and $x_2=5/2$ that can express $S_{33}$, so $S_3$ is linearly dependent. 
+
+# 2
+
+For what values of the scalar $k$ are the three vectors $(k,1,0)',(1,k,1)'$, and
+$(0, 1, k)'$ linearly dependent, and for what values are they linearly independent?
+
+$$
+S_{k2}
+=
+\begin{bmatrix}
+0 \\
+1\\
+k\\
+\end{bmatrix}
+\neq
+x_1 
+\begin{bmatrix}
+k \\
+1\\
+0\\
+\end{bmatrix}
+$$
+
+$$
+S_{k3}
+=
+\begin{bmatrix}
+0 \\
+1\\
+k\\
+\end{bmatrix}
+\neq
+x_1 
+\begin{bmatrix}
+k \\
+1\\
+0\\
+\end{bmatrix}
++
+x_2
+\begin{bmatrix}
+1 \\
+k\\
+1\\
+\end{bmatrix}
+$$
+
+$$
+\begin{bmatrix}
+0 \\
+1\\
+k\\
+\end{bmatrix}
+=
+\begin{bmatrix}
+x_1k +x_2\\
+x_1 + kx_2\\
+x_2\\
+\end{bmatrix}
+=
+\begin{bmatrix}
+x_1k +k\\
+x_1 + k^2\\
+k\\
+\end{bmatrix}
+=
+\begin{bmatrix}
+k(x_1+1)\\
+x_1 + k^2\\
+k\\
+\end{bmatrix}
+$$
+
+## Linear Dependence 
+To find values of $k$ that make the 3 vectors linear dependent, we find a $k$ that allows the solution to work. 
+These are the only 2 possible solutions for the above. 
+
+Solution 1: $k=0$, $x_1=1$, $x_2=k=0$
+
+Solution 2: $k=\sqrt2$, $x_1=-1$, $x_2=k=\sqrt2$
+
+## Linear Independence
+For linear independence, we have to find $k$ such that each vector is not expressible by a linear combination of its previous vectors. As long as $k\neq 0 \neq \sqrt2$ then we should have a linearly independent set of 3 vectors. 
+
+For example, $k$ = 2
+
+$$
+\begin{bmatrix}
+1 \\
+k\\
+1\\
+\end{bmatrix}
+=
+x_1
+\begin{bmatrix}
+k\\
+1\\
+0\\
+\end{bmatrix}
+$$
+
+$$
+\begin{bmatrix}
+1 \\
+2\\
+1\\
+\end{bmatrix}
+=
+x_1
+\begin{bmatrix}
+2\\
+1\\
+0\\
+\end{bmatrix}
+$$
+
+There is no solution for $x_1$. 
+
+$$
+\begin{bmatrix}
+0 \\
+1\\
+k\\
+\end{bmatrix}
+=
+x_1
+\begin{bmatrix}
+k\\
+1\\
+0\\
+\end{bmatrix}
++
+x_2
+\begin{bmatrix}
+1 \\
+k\\
+1\\
+\end{bmatrix}
+$$
+
+$$
+\begin{bmatrix}
+0 \\
+1\\
+2\\
+\end{bmatrix}
+=
+x_1
+\begin{bmatrix}
+2\\
+1\\
+0\\
+\end{bmatrix}
++
+x_2
+\begin{bmatrix}
+1 \\
+2\\
+1\\
+\end{bmatrix}
+$$
+There is no solution of $x_1$ or $x_2$ to satisfy the above. Since the vectors cannot be expressed as linear combinations of its previous vectors, it is linearly independent. 
+
+# 3
+Show that if a set $S = \{u_1, .., u_n\}$ is linearly independent, then any non-empty
+subset of $S$ is also linearly independent.
+
+We use Proof By Contradiction. Instead of trying to prove that the non-empty subset is linearly independent, we assume that it is NOT linearly independent, then show that it's impossible. 
+
+Given $R\subseteq S$, $R = \{S_i,..,S_j\}$, $1\leq i \leq j; i\leq j \leq n$, assume R is linearly dependent. 
+If R is linearly dependent, then there must be some $S_k$ in $\{S_i,..,S_j\}$ which can be represented as a linear combination: 
+$S_k = x_i S_i + ... + S_{k-1} x_{k-1}+ S_{k+1} x_{k+1} + ... + S_jx_j$
+
+By definition $S_k$ must be in $S$ but if $S$ is linearly independent then $S_k$ cannot be represented as a linear combination of other vectors/matrices in $S$ and therefore it presents a contradiction so $S_k$ cannot exist. Since $S_k$ cannot exist then all vectors/matrices in $R$ are expressible as a linear combination of others so $R$ is linearly independent. 
+
+# 4 
+Consider $V =R^2$. Show that $W_1 = \{u=(x,y)' :ax+by=0,a,b \neq 0\}$ is a subspace of $V$ while $W_2 =\{u=(x,y)': ax+by+c=0, a,b,c \neq 0\}$ is not.
+
+To show that $W_1$ is a subspace of $V$ we need to show that $W_1$ is a subset of $V$ and $W_1$ is a linear space. 
+To show that $W_2$ is not a subspace of $V$ we need to show that $W_2$ is not a subset of $V$ or $W_2$ is not a linear space. 
+
+By definition $R^2$ includes all 2-dimensional vectors so $W_1 \subseteq R^2$ and $W_1$ is a linear space if for every $A,B \in W_1$, $A+B \in W_1$. 
+$$
+A
+= 
+\begin{bmatrix}
+x_1\\
+y_1\\
+\end{bmatrix}
+$$
+
+$$
+B
+= 
+\begin{bmatrix}
+x_2\\
+y_2\\
+\end{bmatrix}
+$$
+
+$$
+A+B
+= 
+\begin{bmatrix}
+x_1+x_2\\
+y_1+y_2\\
+\end{bmatrix}
+$$
+From the above, $A+B$ is also in $V$ so $W_1$ is a subspace of $V$. 
+
+To show that $W_2$ is not in $V$, we only need 1 example.
+$$
+C
+= 
+\begin{bmatrix}
+1\\
+0\\
+\end{bmatrix}
+$$
+
+$$
+D
+= 
+\begin{bmatrix}
+-1\\
+0\\
+\end{bmatrix}
+$$
+
+$$
+C+D
+= 
+\begin{bmatrix}
+0\\
+0\\
+\end{bmatrix}
+$$
+
+Both C and D are in $W_2$ because they satisfy the corresponding equation. However, their sum $C+D$ is not in the subspace of $W_2$ because $a(0)+b(0)+c=0$ would mean that $c = 0$ which violates the definition of the set and therefore it is not a linear space and thus it cannot be a subspace of $V$.
+
+# 5
+
+Show that a set of vectors $(x_1, x_2, x_3, x_4)'$ that satisfy the following equations is
+a subspace of $\mathbb{R}^4$:
+
+$3x_1- 2x_2 -x_3 - 4x_4 = 0$
+
+$x_1 +x_2 -2x_3 -3x_4 =0$
+
+By definition $\mathbb{R}^4$ includes all 4-dimensional real column vectors. Hence, $(x_1, x_2, x_3, x_4)' \subseteq \mathbb{R}^4$ and each of its linear combinations are also in $\mathbb{R}^4$. Assume $A$ is a set of vectors that satisfies equation 1 in the above and $B$ is a set of vectors that satisfy the 2nd equation. Then, $A \cap B$ is the set of vectors that satisfy both equations. 
+By definition $A \subseteq \mathbb{R}^4$ and $B \subseteq \mathbb{R}^4$. Since $(A \cap B) \subseteq A$ and $A \subseteq \mathbb{R}^4$, then $A \cap B \subseteq A \subseteq \mathbb{R}^4$. The set of vectors that satisfy both equations are also a subset and therefore a subspace of $\mathbb{R}^4$.
+
+# 6
+
+Let $W_1$ and $W_2$ be subspaces of $V$. Show by example that $W_1 \cup W_2$ may not be a subspace of $V$.
+
+$$
+W_1 = \left\{
+\begin{bmatrix}
+x_1\\
+x_1\\
+\end{bmatrix}, x_1 \in \mathbb{R}
+\right\}
+$$
+
+$$
+W_2 = \left\{
+\begin{bmatrix}
+x_1\\
+0\\
+\end{bmatrix}, x_1 \in \mathbb{R}
+\right\}
+$$
+
+Assume $A \subseteq W_1, B \subseteq W_2$.
+$$
+A = 
+\begin{bmatrix}
+3\\
+3\\
+\end{bmatrix}
+$$
+$$
+B = 
+\begin{bmatrix}
+1\\
+0\\
+\end{bmatrix}
+$$
+$$
+A+B=
+\begin{bmatrix}
+4\\
+3\\
+\end{bmatrix}
+$$
+
+$A+B \notin W_1$, $A+B \notin W_2$ and therefore $A+B \notin W_1 \cup W_2$. By definition, $W_1 \cup W_2$ is a subspace of $V$ if for any matrix $A,B \in V$, $A+B \in V$. Since  $A$ and $B$ are each in the subspace of $W_1$ and $W_2$, they each must also be in the subspace of $V$ and in the subspace of $W_1 \cup W_2$. However, their sum is not in $W_1 \cup W_2$ and therefore we cannot say that $W_1 \cup W_2$ is a subspace of $V$ because vector addition is not closed. 

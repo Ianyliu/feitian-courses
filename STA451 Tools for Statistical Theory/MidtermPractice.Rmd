@@ -1,0 +1,337 @@
+---
+title: "Midterm Practice"
+output:
+  pdf_document: default
+  html_notebook: default
+  html_document:
+    df_print: paged
+---
+
+# 1
+Show that if the set {$u$; $v$; $w$} is linearly independent then so is the set {$2u+v+3w; u+v+2w; u+v+w$}.
+
+$x(2u+v+3w) + y(u+v+2w) + z(u+v+w) = 0 =(2x+y+z)u + (x+y+z)v + (2x+2y+z)w$
+
+
+$u,v,w$ are linear independent then 
+
+$$
+\begin{bmatrix}
+2x + y +z\\
+x + y + z\\
+3x + 2y + z\\
+\end{bmatrix}
+=
+\begin{bmatrix}
+0\\
+0\\
+0\\
+\end{bmatrix}
+$$
+
+We convert into the form $Ax=B$, as 
+
+$$
+X=
+\begin{bmatrix}
+x \\
+y\\
+z\\
+\end{bmatrix}
+$$
+$$
+B=
+\begin{bmatrix}
+0 \\
+0 \\
+0 \\
+\end{bmatrix}
+$$
+A is the coefficient matrix.
+$$
+A=
+\begin{bmatrix}
+2 & 1 & 1 \\
+1 & 1 & 1\\
+3 & 2 & 1\\
+\end{bmatrix}
+$$
+
+We can solve for $X$, but we can also find the determinant of A. If the determinant of A $\neq$ 0 then it is linearly independent.
+
+
+$$
+|A| = 
+\begin{vmatrix}
+2 & 1 & 1 \\
+1 & 1 & 1\\
+3 & 2 & 1\\
+\end{vmatrix}
+=
+\begin{vmatrix}
+1 & 0 & 0 \\
+0 & 0 & 1 \\
+0 & 1 & 0\\
+\end{vmatrix}
+$$
+I used row operations to simplify the matrix so as to simplify determinant calculation. 
+$|A| = 1 * (0-1) = -1 \neq 0$ so set is linearly independent.
+
+If I did not use the simplification, it would be as follows: 
+$|A| = 2 * (1-2) - 1 * (1-3) + 1 * (2-3) = -2  + 2 + 1  = 1 \neq 0$
+
+# 2
+
+Let $A$ represent a $q\times p$ matrix, $B$ a $p\times n$ matrix, and $C$ an $m\times q$ matrix. Show that if rank($CAB$) $=$ rank($B$), then rank($AB$) $=$ rank($B$).
+
+If rank($CAB$) = rank($B$), $R(CAB) = R(B)$ by Corollary 4.4.7. 
+
+$R(B) \subset R(CAB)$ since $R(CAB) = R(B)$ (by definition).
+
+$R(B) \subset R(CAB)$ if and only if there is F such that $B = FCAB$ (by Lemma 4.2.2).
+
+rank($B$) = rank($FCAB$) $\leq$ rank($AB$) $\leq$ rank($B$)
+
+rank($B$) = rank($AB$)
+
+# 3
+Let $A$ represent an $n \times  n$ nonnull symmetric matrix, and let $B$ represent an $n\times r$ matrix of full column rank $r$ and $T$ an $r\times n$ matrix of full row rank $r$ such that $A = BT$. Show that the $r \times  r$ matrix $TB$ is nonsingular. (Hint: $A ^\prime A = A^2 = BTBT$.)
+
+rank($A$) = rank($A ^\prime A$) by Corollary 7.4.5.
+
+According to Lemma 8.3.2, If $A$ has full column rank, then rank($AB$) = rank($B$). If $B$ has full row rank, rank($AB$) = rank($A$).
+
+rank($A$) = rank($BT$). Since $B$ has full column rank, we can drop $B$ so that rank($BT$) = rank($T$) = $r$.
+
+We know that rank($A ^\prime A$) = rank($BTBT$) = rank($TBT$) because $B$ has full column rank. 
+
+rank($TBT$) = rank($TB$) because $T$ has full row rank. 
+
+Thus,
+$r =$ rank($A$) = rank($A ^\prime A$) = rank ($BTBT$) = rank ($TBT$) = rank ($TB$)
+
+
+# 4
+Calculate the general inverse matrix of 
+
+$$
+\begin{pmatrix}
+4 & 2 & 0 & 0 \\
+2 & 1 & 0 & 0\\
+0 & 0 & 0 & 0\\
+0 & 0 & 1 & 2\\
+\end{pmatrix}
+=
+\begin{bmatrix}
+A_{11}  & 0 \\
+0 & A_{22}\\
+\end{bmatrix}
+$$
+
+The generalized inverse is given by Corollary 9.6.3: 
+$$
+\begin{bmatrix}
+A^-_{11}  & 0 \\
+0 & A^-_{22}\\
+\end{bmatrix}
+$$
+
+Neither $A^-_{11}$ or $A^-_{22}$ are invertible because their determinant = 0. But that does not mean we cannot find its generalized inverse. For $A^-_{11}$:
+
+$$
+\begin{bmatrix}
+4 & 2 \\
+2 & 1\\
+\end{bmatrix}
+\begin{bmatrix}
+x & y \\
+z & w\\
+\end{bmatrix}
+\begin{bmatrix}
+4 & 2 \\
+2 & 1\\
+\end{bmatrix}
+=
+\begin{bmatrix}
+4 & 2 \\
+2 & 1\\
+\end{bmatrix}
+$$
+
+$$
+\begin{bmatrix}
+4x + 2z & 4y + 2w\\
+2x + z & 2y + w \\
+\end{bmatrix}
+\begin{bmatrix}
+4 & 2\\
+2 & 1 \\
+\end{bmatrix}
+=
+\begin{bmatrix}
+4 & 2\\
+2 & 1 \\
+\end{bmatrix}
+$$
+
+$$
+\begin{bmatrix}
+4(4x + 2z) + 2(4y + 2w) &  2(4x + 2z) + 1(4y + 2w)\\
+4(2x + z) + 2(2y + w) & 2(2x + z) + 1(2y + w) \\
+\end{bmatrix}
+=
+\begin{bmatrix}
+4 & 2\\
+2 & 1 \\
+\end{bmatrix}
+=
+\begin{bmatrix}
+16x + 8z + 8y + 4w &  8x + 4z + 4y + 2w\\
+8x + 4z + 4y + 2w & 4x + 2z + 2y + w \\
+\end{bmatrix}
+=
+\begin{bmatrix}
+4 & 2\\
+2 & 1 \\
+\end{bmatrix}
+$$
+
+One solution is 
+$$
+A^-_{11}
+= 
+\begin{bmatrix}
+x & y \\
+z & w\\
+\end{bmatrix}
+=
+\begin{bmatrix}
+1 & -1 \\
+-1 & 1\\
+\end{bmatrix}
+$$
+$x = 1, z=-1,  y=-1, w=1$.
+
+
+For $A^-_{22}$:
+$$
+\begin{bmatrix}
+0 & 0 \\
+1 & 2\\
+\end{bmatrix}
+\begin{bmatrix}
+x & y \\
+z & w\\
+\end{bmatrix}
+\begin{bmatrix}
+0 & 0 \\
+1 & 2\\
+\end{bmatrix}
+=
+\begin{bmatrix}
+0 & 0 \\
+1 & 2\\
+\end{bmatrix}
+$$
+$$
+\begin{bmatrix}
+0x + 0z & 0y + 0w \\
+1x + 2z & 1y + 2w \\
+\end{bmatrix}
+\begin{bmatrix}
+0 & 0 \\
+1 & 2\\
+\end{bmatrix}
+=
+\begin{bmatrix}
+0 & 0\\
+1x + 2z & 1y + 2w \\
+\end{bmatrix}
+\begin{bmatrix}
+0 & 0 \\
+1 & 2\\
+\end{bmatrix}
+=
+\begin{bmatrix}
+0 & 0 \\
+1 & 2\\
+\end{bmatrix}
+$$
+$$
+\begin{bmatrix}
+0 + 0 & 0 + 0\\
+0 + 1(1y + 2w) & 0 + 2(1y + 2w) \\
+\end{bmatrix}
+=
+\begin{bmatrix}
+0 & 0 \\
+1y + 2w & 2(1y + 2w) \\
+\end{bmatrix}
+=
+\begin{bmatrix}
+0 & 0 \\
+1 & 2\\
+\end{bmatrix}
+$$
+Since  $1y + 2w =1$, one solution could be $w=0$, $y=1$. Another solution could be $y=2$, w$=-1/2$.
+
+One solution is 
+$$
+A^-_{22}
+= 
+\begin{bmatrix}
+x & y \\
+z & w\\
+\end{bmatrix}
+=
+\begin{bmatrix}
+0 & 1 \\
+0 & 0\\
+\end{bmatrix}
+$$
+
+Thus, the generalized inverse 
+$$
+\begin{bmatrix}
+A^-_{11}  & 0 \\
+0 & A^-_{22}\\
+\end{bmatrix}
+=
+\begin{pmatrix}
+1 & -1 & 0 & 0 \\
+-1 & 1 & 0 & 0\\
+0 & 0 & 0 & 1\\
+0 & 0 & 0 & 0\\
+\end{pmatrix}
+$$
+
+# 5
+
+Let $A$ represent an $n \times   n$ matrix such that $A ^\prime A =  AA ^\prime = AA$. 
+
+(a) Show that tr[$(A - A ^\prime)^\prime (A - A ^\prime)] = 0$.
+
+
+$(A - A ^\prime)^\prime (A - A ^\prime) = ((-A^\prime)^\prime + A ^\prime) (A - A ^\prime)$
+$= (-A + A^\prime) (A - A ^\prime) =$
+$-AA + A^\prime A + A A^\prime - A^\prime A^\prime$
+
+tr$(-AA + A^\prime A + A A^\prime - A^\prime A^\prime) =$ 
+tr$(-AA)+$tr$(A^\prime A)+$tr$(A A^\prime)+$tr$(- A^\prime A^\prime)=$
+$-$tr$(AA)+$tr$(A^\prime A)+$tr$(A A^\prime)-$tr$(A^\prime A^\prime)$
+
+By (2.8) we know that tr$(AB)$ = tr$(B ^\prime A ^\prime )$ = tr$(BA)$ = tr$(A ^\prime B ^\prime)$. Thus we know that tr$(AA)$ = tr$(A ^\prime A ^\prime)$ and that tr$(A^\prime A)=$ tr$(A A^\prime)$. Hence, $-$tr$(AA)+$tr$(A^\prime A)+$tr$(A A^\prime)-$tr$(A^\prime A^\prime)=$
+$2$tr$(A^\prime A)-2$tr$(AA)$
+
+By definition, tr$(AA)=\sum_{j=1}^{n}\sum_{i=1}^{m} a_{ij}a_{ij}=\sum_{j=1}^{n}\sum_{i=1}^{m} a_{ij}^2$ and by (2.5) 
+tr$(A^\prime A)=\sum_{i=1}^{m}\sum_{j=1}^{n} a_{ij}^2$. Therefore, tr$(AA)=$tr$(A^\prime A)$ and thus 
+$2$tr$(A^\prime A)-2$tr$(AA)=0$
+
+
+(b) Show that $A$ is symmetric.
+
+Lemma 5.3.1 states: For any $m$×$n$ matrix $A = \{a_{ij}\}$, $A = 0$ if and only if tr$(A ^\prime A) = 0$.
+
+Set $F = A - A^\prime$ so that tr$(F ^\prime F)=$tr$((A - A^\prime) ^\prime (A - A^\prime))$
+
+We have shown in 5a that tr$((A - A^\prime) ^\prime (A - A^\prime))=0$ so we show that $F=0$. If $F=0$ it means that $A - A^\prime = 0$ and since the definition of symmetric is for  $A ^\prime = A$ or $A ^\prime  - A = 0$ or or $A  - A ^\prime = 0$, we have shown that $A$ is symmetric. 

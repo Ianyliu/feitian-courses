@@ -1,0 +1,36 @@
+---
+title: "Tools for Stat Theory HW5"
+output:
+  pdf_document: default
+  html_notebook: default
+  html_document:
+    df_print: paged
+---
+
+# 1 Lemma 9.2.8 Prove part (2).
+
+Lemma 9.2.8: Let A represent a matrix of full column rank and B a matrix of full row rank. Then, (1) a matrix G is a generalized inverse of A if and only if G is a left inverse of A. And, (2) a matrix G is a generalized inverse of B if and only if G is a right inverse of B.
+
+First we show that if B has right inverse it must be a generalized inverse. By Lemma 8.1.1, B has a right inverse R such that $BR=I_m$. Then $BRB = IB = B$ and thus $R$ is a generalized inverse of B. We have shown that if R is a right inverse of B, it must be a generalized inverse of B. Therefore R = G.
+
+Now we need to show that if G is a generalized inverse of B, it is a right inverse of B (G=R). Suppose R is a right inverse and G is a generalized inverse of B, $BG = BGI = BGBR = (BGB)R = BR$. Thus we show that $BG = BR$ and that G, the generalized inverse of B, is also a right inverse of B. 
+
+
+# 2. Prove Lemma 9.2.9.
+Lemma 9.2.9: If a matrix $A$ has full column rank, then the matrix $(A^\prime A)^{-1}A^\prime$ is a left inverse of A. Similarly, if A has full row rank, then $A^{\prime}(A A^\prime)^{-1}$ is a right inverse of A. 
+
+By Corollary 7.4.6, if a matrix $A$ has full column rank, then $A^\prime A$ is nonsingular and by Corollary 8.1.2, $A^\prime A$ has both left and right inverse and by Theorem 8.1.4 it has a unique inverse $(A^\prime A)^{-1}$ and no other left or right inverse.Thus, we have
+$(A^\prime A)^{-1}A^\prime A = (A^\prime A)^{-1}(A^\prime A) = I$
+
+If $A$ has full row rank, then by Lemma 8.1.1, we know that $A$ has left inverse and that it is a generalized inverse (Lemma 9.2.8). If $A$ has full row rank, we know that $A^\prime$ has full column rank and therefore by Corollary 7.4.6 $AA^\prime$ is nonsingular and has a unique inverse $(AA^\prime)^{-1}$by Corollary 8.1.2 and Theorem 8.1.4. Thus, $AA^{\prime}(A A^\prime)^{-1} = (AA^{\prime})(A A^\prime)^{-1} = I$ thus we show that $A^{\prime}(A A^\prime)^{-1}$ is a right inverse of A.
+
+
+# 3. Lemma 9.3.5 Prove row space part
+Lemma 9.3.5. Let $A$ represent an m × n matrix. Then, for any m × p matrix $B$, $C(B) \subset C(A)$ if and only if $B=AA^-B$, or, equivalently, if and only if $(I-AA^-)B = 0$. And, for any q×n matrix $C$, $R(C) \subset R(A)$ if and only if $C=CA^-A$, or, equivalently, if and only if $C(I-A^-A)=0$.
+
+Show if $C=CA^-A$ then $R(C) \subset R(A)$:
+By Corollary 4.2.3, $R(C) = R(CA^-A) \subset R(A)$.
+
+Show if $R(C) \subset R(A)$ then $C=CA^-A$: By Lemma 4.2.2, $R(C) \subset R(A)$ if and only if there exists a matrix $L$ such that $C = LA$. By Corollary 9.1.4, $A=AA^-A$. As such, $C = LA = L(AA^-A) = (LA)A^-A = CA^-A$.
+
+We thus show that $R(C) \subset R(A)$ if and only if $C=CA^-A$.

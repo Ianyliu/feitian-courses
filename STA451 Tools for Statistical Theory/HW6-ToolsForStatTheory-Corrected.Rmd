@@ -1,0 +1,52 @@
+---
+title: "Tools for Stat Theory HW6"
+output:
+  pdf_document: default
+  html_notebook: default
+  html_document:
+    df_print: paged
+---
+
+# 1 
+
+Let $A$ represent an m × n matrix. Show that if $A^\prime A$ is idempotent, then $AA^\prime$ is idempotent.
+
+If $A^\prime A$ is idempotent, then $A^\prime A A^\prime A = A^\prime A = A^\prime A I$.Based on Corollary 5.5.3, we can conclude that $A A^\prime A = AI = A$. Therefore $|AA^\prime|^2=AA^\prime A A^\prime = A A^\prime$, implying that $AA^\prime$ is idempotent.
+
+# 2
+
+Let $A$ and $B$ represent n × n symmetric idempotent matrices. Show that if $C(A) = C(B)$, then $A = B$.
+
+If $C(A) = C(B)$, suppose there exists matrix $F_1, F_2$ such that $A=BF_1$ and $A=AF_2$. Also,
+
+$B=B^\prime=(AF_2)^\prime=F_2^\prime A^\prime=F_2^\prime A$.
+
+$A=BBF_1=BA=F_2^\prime AA=F^\prime_2A=B$
+
+# 3
+
+Let $A$ represent an r×m matrix and $B$ an m×n matrix. (a) Show that $B^- A^-$ is a generalized inverse of $AB$ if and only if $A^-ABB^-$ is idempotent.
+
+(i) If $A^-ABB^-$ is idempotent show that $B^- A^-$ is a generalized inverse of $AB$.
+
+If $B^{-}A^{-}$ is the generalized inverse of $AB$, then $ABB^{-}A^{-}AB=AB$. 
+
+$A^{-}ABB^{-}A^{-}ABB^{-}=A^{-}ABB^{-}$. Thus $A^-ABB^-$  is idempotent.
+
+(ii) If $B^- A^-$ is a generalized inverse of $AB$ show that $A^-ABB^-$ is idempotent.
+
+If $A^-ABB^-$  is idempotent, then $A^{-}ABB^{-}A^{-}ABB^{-}=A^{-}ABB^{-}$
+
+$AA^{-}ABB^{-}A^{-}ABB^{-}B=AA^{-}ABB^{-}B$
+
+$ABB^{-}A^{-}AB=AB$
+
+Hence, $B^- A^-$ is the generalized inverse of $AB$.
+
+# 4 
+
+Show that, for any matrix $A$, $C(A)=\mathcal{N}(I-AA^-)$. 
+
+Corollary 9.3.6. Let $A$ represent an m × n matrix. Then, for any m-dimensional column vector $x$, $x \in C(A)$ if and only if $x = AA^-    x$, and, for any n-dimensional row vector $y^\prime$, $y^\prime  \in R(A)$ if and only if $y^\prime = y^\prime A^- A$.
+
+Let $x$ be the column vector whose dimension equals the number of rows in $A$. By Corollary 9.3.6, we know $x \in C(A)$ if and only if $x = A A^{-}x$. Equivalently, $(I-AA^{-})x=0$ and hence if and only if $x \in \mathcal{N}(I-AA^{-})$. Therefore, we can conclude that $C(A)=\mathcal{N}(I-AA^{-})$.

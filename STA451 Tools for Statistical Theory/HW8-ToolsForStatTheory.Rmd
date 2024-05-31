@@ -1,0 +1,184 @@
+---
+title: "Tools for Stat Theory HW8"
+output:
+  pdf_document: default
+  html_notebook: default
+  html_document:
+    df_print: paged
+---
+
+# 1 
+
+Let $X  = \{x_{ij} \}$ represent an $m$ × $n$ matrix of $mn$ ”independent” variables, and suppose that $X$ is free to range over all of $R^{m×n}$. Show that, for any $p$ × $m$ and $n$ × $p$ matrices of constants $A$ and $B$,
+
+$$
+\frac{\partial tr(AXB)}{\partial X} 
+= A^\prime B^\prime
+$$
+By (6.5), $\frac{\partial tr(AX)}{\partial X} = A^\prime$.
+
+$$
+\frac{\partial tr(AXB)}{\partial X} =
+\frac{\partial tr(BAX)}{\partial X} = 
+\frac{\partial tr((BA)X)}{\partial X} = 
+(BA)^\prime =
+A^\prime B^\prime
+$$
+
+
+# 2
+
+Let $X = \{x_{st}\}$ represent an $m$ × $n$ matrix of $mn$ ”independent” variables, and suppose that $X$ is free to range over all of $R^{m×n}$. Show that, for any $m$ × $m$ matrix of
+constants A,
+
+$$
+\frac{\partial tr(X^\prime A X)}{\partial X} 
+= (A+A^\prime)X
+$$
+
+By (6.5), $\frac{\partial tr(AX)}{\partial X} = A^\prime = \frac{\partial tr(XA)}{\partial X}$. See $X^\prime A$ as $B_2$ and $AX$ as $B_1$.
+$$
+\frac{\partial tr(X^\prime A X)}{\partial X} =
+B_1 + B_2^\prime = AX + (X'A)^\prime = AX +A^\prime X = (A+A^\prime)X
+$$
+
+# 3
+
+Let $X = \{x_{ij} \}$ represent an $m$ × $m$ matrix of $m^2$ ”independent” variables (where $m \geq 2$), and suppose that $X$ is free to range over all of $R^{m×m}$. Show that (for any positive integer $k$) the function $f$ defined (on $R^{m×m}$) by $f(X) = |X|^k$ is continuously differentiable at every $X$ and that
+
+$$
+\frac{\partial |X|^k}{\partial X} 
+= k|X|^{k-1}[adj(X)]^\prime
+$$
+We can define $y=|X|$. 
+$$
+\frac{\partial |X|^k}{\partial X}  = 
+\frac{\partial y^k}{\partial y}  \frac{\partial y}{\partial X}  
+= k y^{k-1} [adj(X)] ^\prime
+= k |X| ^{k-1} [adj(X)] ^\prime
+$$
+The determinant is a polynomial and the kth power of the determinant is still a polynomial. Thus, they are all continuously differentiable.
+
+# 4
+
+Let $F$ = 
+$$
+\begin{pmatrix}
+sin x & sin 2x \\
+cos x & cos 3x \\
+\end{pmatrix} 
+$$
+Calculate
+
+a) $\frac{dF^{-1}}{dx}$
+
+$$
+F^{-1} = \frac{1}{|F|} \begin{bmatrix}
+cos 3x & - sin 2x \\
+- cos x & sin x  \\
+\end{bmatrix} 
+= \frac{1}{cos(3x)sin(x)-cos(x)sin(2x)} \begin{bmatrix}
+cos 3x & - sin 2x \\
+- cos x & sin x  \\
+\end{bmatrix} 
+$$
+$$
+\frac{\partial F}{ \partial x} = 
+\begin{bmatrix}
+cos x & 2 cos 2x \\
+-sinx & -3 sin3x \\
+\end{bmatrix} 
+$$
+
+By (8.15), 
+$$
+\frac{\partial F^{-1}}{ \partial x} = -F^{-1} \frac{\partial F}{ \partial x}F^{-1} = 
+$$
+
+$$
+- \frac{1}{cos(3x)sin(x)-cos(x)sin(2x)}
+\begin{bmatrix}
+cos 3x & - sin 2x \\
+- cos x & sin x  \\
+\end{bmatrix} 
+\frac{\partial F}{\partial x}
+\frac{1}{cos(3x)sin(x)-cos(x)sin(2x)}
+\begin{bmatrix}
+cos 3x & - sin 2x \\
+- cos x & sin x  \\
+\end{bmatrix} =
+$$
+$$
+- \frac{1}{cos(3x)sin(x)-cos(x)sin(2x)}
+\frac{1}{cos(3x)sin(x)-cos(x)sin(2x)}
+\begin{bmatrix}
+cos 3x & - sin 2x \\
+- cos x & sin x  \\
+\end{bmatrix} 
+\frac{\partial F}{\partial x}
+\begin{bmatrix}
+cos 3x & - sin 2x \\
+- cos x & sin x  \\
+\end{bmatrix} =
+$$
+$$
+- \frac{1}{[cos(3x)sin(x)-cos(x)sin(2x)]^2}
+\begin{bmatrix}
+cos 3x & - sin 2x \\
+- cos x & sin x  \\
+\end{bmatrix} 
+\frac{\partial F}{\partial x}
+\begin{bmatrix}
+cos 3x & - sin 2x \\
+- cos x & sin x  \\
+\end{bmatrix} =
+$$
+
+$$
+- \frac{1}{[cos(3x)sin(x)-cos(x)sin(2x)]^2}
+\begin{bmatrix}
+cos 3x & - sin 2x \\
+- cos x & sin x  \\
+\end{bmatrix} 
+\begin{bmatrix}
+cos x & 2 cos 2x \\
+-sinx & -3 sin3x \\
+\end{bmatrix} 
+\begin{bmatrix}
+cos 3x & - sin 2x \\
+- cos x & sin x  \\
+\end{bmatrix} =
+$$
+
+
+b) $\frac{\partial det(F)}{\partial x}$
+
+By (8.5), $\frac{\partial det(F)}{\partial x}=|F|tr(F^{-1}\frac{\partial F}{\partial x})$
+
+$$
+\frac{\partial det(F)}{\partial x}=
+[cos(3x)sin(x)-cos(x)sin(2x)] tr\left (
+\frac{1}{cos(3x)sin(x)-cos(x)sin(2x)}
+\begin{bmatrix}
+cos 3x & - sin 2x \\
+- cos x & sin x  \\
+\end{bmatrix} 
+\begin{bmatrix}
+cos x & 2 cos 2x \\
+-sinx & -3 sin3x \\
+\end{bmatrix} 
+\right ) =
+$$
+$$
+tr\left (
+\begin{bmatrix}
+cos 3x \cdot cosx + - sin 2x \cdot -sin x & cos 3x \cdot 2cos2x + - sin 2x \cdot -3sin 3x \\
+- cos x \cdot cosx + sin x  \cdot -sinx & - cos x \cdot 2cos2x + sin x  \cdot -3sin3x  \\
+\end{bmatrix} 
+\right ) =
+$$
+
+
+$$
+cos 3x \cdot cosx + - sin 2x \cdot -sin x + - cos x \cdot 2cos2x + sin x  \cdot -3sin3x 
+$$

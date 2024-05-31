@@ -1,0 +1,184 @@
+---
+title: "Tools for Stat Theory HW7"
+output:
+  pdf_document: default
+  html_notebook: default
+  html_document:
+    df_print: paged
+---
+
+# 1 
+
+Prove Lemma 12.1.1: Let $Y$ represent a matrix in a linear space $V$, let $U$ and $W$ represent subspaces of $V$, and take $\{X_1, ..., X_s \}$ to be a set of matrices that spans $U$ and $\{Z_1, ...,Z_t\}$ to be a set that spans $W$. Then, $Y \perp U$ if and only if $Y \cdot X = 0$ for $i = 1,...,s$; that is, $Y$ is orthogonal to $U$ if and only if $Y$ is orthogonal to each of the matrices $X_1,...,X_s$. And, similarly, $U \perp W$ if and only if $X \cdot Z = 0$ for $i = 1,...,s$ and $j = 1,...,t$; that is, $U$ is orthogonal to $W$ if and only if each of the matrices $X_1 ,..., X_s$ is orthogonal to each of the matrices $Z_1, ..., Z_t$.
+
+Since $\{X_1, ..., X_s \}$ span $U$, then $U$ can be represented as a linear combination of $\{X_1, ..., X_s \}$: $U = a_1X_1 + ... + a_sX_s$. 
+
+1) Prove $Y$ is orthogonal to $U$ if $Y$ is orthogonal to each of the matrices $X_1,...,X_s$
+
+If $Y$ is orthogonal to each of the matrices $X_1,...,X_s$, then 
+
+$$Y \cdot a_1X_1 + ... + Y \cdot a_sX_s = 0$$. 
+By the property of matrix multiplication, we can convert it to the following form
+
+$$Y \cdot (a_1X_1 + ... + a_sX_s) = 0$$
+
+Since $U$ can be represented as a linear combination $U = a_1X_1 + ... + a_sX_s$, then if Y is orthogonal to all linear combinations of $\{X_1, ..., X_s \}$, then Y is orthogonal to U.
+
+2) Prove $Y$ is orthogonal to each of the matrices $X_1,...,X_s$ if $Y$ is orthogonal to $U$ 
+
+If $Y$ orthogonal to $U$, then $Y$ orthogonal to $\{X_1, ..., X_s \}$ by definition because $\{X_1, ..., X_s \} \subset U$. 
+
+
+# 2
+
+For the example of Section 12.2c,recompute the projection of $y$ on $U$ by taking $X$ to be the $3$ × $2$ matrix
+$$
+\begin{pmatrix}
+0 & -2 \\
+3 & 2 \\
+6 & 4 \\
+\end{pmatrix}
+$$....
+
+and carrying out the two steps: 
+
+(1) compute the solution to the normal solutions $X ^\prime X b= X^\prime y$;
+(2) postmultiply $X$ by the solution you computed in Step (1).
+
+1) Compute solution to normal solutions
+
+$$
+X ^\prime y=
+\begin{bmatrix}
+6 & 3 & 0 \\
+4 & 2 & -2 \\
+\end{bmatrix}
+\begin{bmatrix}
+3\\
+-\frac{38}{5}\\
+\frac{74}{5} \\
+\end{bmatrix}
+$$
+
+$$
+b = X^{-1} (X^{\prime})^{-1} X^\prime y
+$$
+
+```{r}
+X <- matrix(c(0,3,6, -2,2,4), nrow=3)
+X_prime <- t(X)
+y <- matrix(c(3, -38/5, 74/5), ncol =1)
+
+XtX <- t(X) %*% X
+Xty <- t(X) %*% y
+
+b <- solve(XtX, Xty)
+
+print("SOLUTION:")
+print(b)
+print("XtXb:")
+print(XtX %*% b)
+print("Xty")
+print(Xty)
+```
+2) Postmultiply $X$ by $b$
+```{r}
+print(X %*% b)
+```
+
+
+# 3 
+
+Prove Theorem 13.2.6: If an $n$ × $n$ matrix $B = \{b_{ij} \}$ is formed from an $n$ × $n$ matrix $A = \{a_{ij} \}$ by interchanging two rows or two columns of $A$, then $|B| = -|A|$.
+
+We will first try to prove the theorem using a special case of swapping 2 rows of A to obtain B, as follows:
+$$
+A = \begin{bmatrix}
+a_{11} & a_{12} & ... & a_{1n}\\
+a_{21} & a_{22} & ... & a_{2n}\\
+... & ... & ... & ... \\
+a_{n1} & a_{n2} & ... & a_{nn}\\
+\end{bmatrix}
+$$
+
+$$
+B = \begin{bmatrix}
+b_{11} & b_{12} & ... & b_{1n}\\
+b_{21} & b_{22} & ... & b_{2n}\\
+... & ... & ... & ... \\
+b_{n1} & b_{n2} & ... & b_{nn}\\
+\end{bmatrix} = 
+\begin{bmatrix}
+a_{21} & a_{22} & ... & a_{2n}\\
+a_{11} & a_{12} & ... & a_{1n}\\
+... & ... & ... & ... \\
+a_{n1} & a_{n2} & ... & a_{nn}\\
+\end{bmatrix}
+$$
+
+
+We can expand $|A|$ along its first row to obtain its value: $|A| = \sum^n_{j=1}a_{1j}(-1)^{1+j}|A_{1j}|$. The property of the cofactor expansion is such that whichever row or column we choose to expand by, the results are the same.
+
+To obtain $|B|$ we can expand along the 2nd row as well, $|B| = \sum^n_{j=1}b_{2j}(-1)^{2+j}|B_{2j}| = \sum^n_{j=1}a_{1j}(-1)^{2+j}|A_{1j}|$
+
+In this case, we show that $|B_{2j}| = |A_{1j}|$ because it's along the same row. Since the cofactor expansions along the other row are the same, $|B| = -|A|$. 
+
+Now that we show that $|B| = -|A|$ in the case that $B$ is just $A$ with the 1st and 2nd row swapped. To find B in the general case. We can assume that there is row f and row h. Between row f and row h there are k rows.  We can swap the hth row with the rows above it one by one until it reaches the original positions of row f. Now f will be at k+2th row after k swaps. To swap h & f back we need k + 1 more swaps so $(-1)^{2k+1}$. 
+
+# 4
+
+Numerically test: determinant keeps invariant when we expend by every row or every column (with order $n \geq 6$, randomly generate integers as matrix elements), i.e., det($A$) $= \sum_{j=1}^{n} a_{ij}(-1)^{i+j}$ det($A_{ij}$) where $A_{ij}$ is the submatrix of $A$ by deleting the $i$th row and $j$th column of $A$, $(-1)^{i+j}$det($A_{ij}$) is the **cofactor of matrix A** or **algebraic cofactor of matrix A**, apply R or Python function to calculate det($A_{ij}$) is available.
+
+```{r setup, include = FALSE}
+library(reticulate)
+use_python("/Users/ianliu/miniconda3/bin/python3")
+```
+
+
+```{python, include = TRUE}
+import numpy as np 
+
+def calc_det_row(A, i):
+  n = A.shape[0]
+  det = 0
+  for j in range(0, n):
+    A_ij = np.delete(A, i, axis=0)
+    A_ij = np.delete(A_ij, j, axis=1)
+    det_A_ij = np.linalg.det(A_ij)
+    det += A[i,j] * (-1) ** (i + j + 2) * det_A_ij
+  
+  return det
+
+def calc_det_col(A, j):
+  n = A.shape[0]
+  det = 0
+  for i in range(0, n):
+    A_ij = np.delete(A, i, axis=0)
+    A_ij = np.delete(A_ij, j, axis=1)
+    det_A_ij = np.linalg.det(A_ij)
+    det += A[i,j] * (-1) ** (i + j + 2) * det_A_ij
+  
+  return det
+
+for n in range(6, 9):
+
+  A = np.random.randint(-30, 30, size=(n, n))
+  det_A = np.linalg.det(A).round(0)  # compute the determinant of A
+  print(det_A)
+  
+  dets = []
+  for i in range(0, n):
+    det = calc_det_row(A, i)
+    det = det.round(0)
+    assert(det_A - det <= 1)
+    dets.append(det)
+    det = calc_det_col(A, i)
+    det = det.round(0)
+    assert(det_A - det <= 1)
+    dets.append(det)
+  print(dets)
+  
+print("Determinant is invariant")
+  
+```
+
